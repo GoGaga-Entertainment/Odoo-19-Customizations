@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_ecommerce_product_custom" model="ir.ui.view">
+        <field name="name">res.config.settings.view.ecommerce.product.custom</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="website_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='website_payment_block']" position="inside">
+
+                <!-- ════════════════════════════════════════════════════
+                     Abandoned Cart Recovery Discount
+                ════════════════════════════════════════════════════ -->
+                <setting id="abandoned_cart_discount_box"
+                         groups="sales_team.group_sale_manager"
+                         title="Abandoned Cart Recovery Discount"
+                         help="Offer escalating discounts to customers who abandon their cart. Discounts are applied automatically when they return to the cart page, up to a configured maximum, within the configured time window.">
+                    <field name="abandoned_cart_discount_enabled"/>
+
+                    <div class="content-group" invisible="not abandoned_cart_discount_enabled">
+                        <div class="row mt16">
+                            <label for="abandoned_cart_strategy"
+                                   class="col-lg-4 o_light_label"
+                                   string="Discount Strategy"/>
+                            <field name="abandoned_cart_strategy"
+                                   class="col-lg-3"/>
+                        </div>
+
+                        <div class="row mt8">
+                            <label for="abandoned_cart_delay_hours"
+                                   class="col-lg-4 o_light_label"
+                                   string="Abandonment Delay (hours)"/>
+                            <field name="abandoned_cart_delay_hours"
+                                   class="col-lg-2"/>
+                        </div>
+
+                        <div class="row mt8">
+                            <!-- Escalating -->
+                            <label for="abandoned_cart_discount_start"
+                                   class="col-lg-4 o_light_label"
+                                   string="Starting Discount (%)"
+                                   invisible="abandoned_cart_strategy == 'reverse'"/>
+                            <field name="abandoned_cart_discount_start"
+                                   class="col-lg-2"
+                                   widget="float"
+                                   digits="[6,2]"
+                                   invisible="abandoned_cart_strategy == 'reverse'"/>
+
+                            <!-- Diminishing -->
+                            <label for="abandoned_cart_discount_max"
+                                   class="col-lg-4 o_light_label"
+                                   string="Max Total Discount (%)"
+                                   invisible="abandoned_cart_strategy != 'reverse'"/>
+                            <field name="abandoned_cart_discount_max"
+                                   class="col-lg-2"
+                                   widget="float"
+                                   digits="[6,2]"
+                                   invisible="abandoned_cart_strategy != 'reverse'"/>
+                        </div>
+
+                        <div class="row mt8">
+                            <label for="abandoned_cart_discount_step"
+                                   class="col-lg-4 o_light_label"
+                                   string="Incremental Step (%)"/>
+                            <field name="abandoned_cart_discount_step"
+                                   class="col-lg-2"
+                                   widget="float"
+                                   digits="[6,2]"/>
+                        </div>
+
+                        <div class="row mt8">
+                            <!-- Escalating -->
+                            <label for="abandoned_cart_discount_max"
+                                   class="col-lg-4 o_light_label"
+                                   string="Max Total Discount (%)"
+                                   invisible="abandoned_cart_strategy == 'reverse'"/>
+                            <field name="abandoned_cart_discount_max"
+                                   class="col-lg-2"
+                                   widget="float"
+                                   digits="[6,2]"
+                                   invisible="abandoned_cart_strategy == 'reverse'"/>
+
+                            <!-- Diminishing -->
+                            <label for="abandoned_cart_discount_start"
+                                   class="col-lg-4 o_light_label"
+                                   string="Ending Discount (%)"
+                                   invisible="abandoned_cart_strategy != 'reverse'"/>
+                            <field name="abandoned_cart_discount_start"
+                                   class="col-lg-2"
+                                   widget="float"
+                                   digits="[6,2]"
+                                   invisible="abandoned_cart_strategy != 'reverse'"/>
+                        </div>
+
+                        <div class="row mt8">
+                            <label for="abandoned_cart_discount_hours"
+                                   class="col-lg-4 o_light_label"
+                                   string="Offer Valid For (hours)"/>
+                            <field name="abandoned_cart_discount_hours"
+                                   class="col-lg-2"/>
+                        </div>
+
+                        <div class="row mt8">
+                            <div class="col-lg-8">
+                                <span class="text-muted" style="font-size:0.82rem;">
+                                    Example: Start = 5%, Step = 5%, Max = 20%, Hours = 24.
+                                    Customer returns after 8 h → 10% discount applied automatically on their cart.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+
+                <!-- ════════════════════════════════════════════════════
+                     Wishlist Special Day Discount
+                ════════════════════════════════════════════════════ -->
+                <setting id="wishlist_special_day_box"
+                         groups="sales_team.group_sale_manager"
+                         title="Wishlist Special Day Discount"
+                         help="Offer a one-day discount on all wishlist items on a specific calendar date. The discount is applied to the cart line automatically when the customer visits their cart on that day.">
+                    <field name="wishlist_special_day_enabled"/>
+                    <div class="content-group" invisible="not wishlist_special_day_enabled">
+                        <div class="row mt16">
+                            <label for="wishlist_special_day_date"
+                                   class="col-lg-4 o_light_label"
+                                   string="Special Day Date"/>
+                            <field name="wishlist_special_day_date"
+                                   class="col-lg-3"
+                                   widget="date"/>
+                        </div>
+                        <div class="row mt8">
+                            <label for="wishlist_special_day_discount"
+                                   class="col-lg-4 o_light_label"
+                                   string="Discount on Special Day (%)"/>
+                            <field name="wishlist_special_day_discount"
+                                   class="col-lg-2"
+                                   widget="float"
+                                   digits="[6,2]"/>
+                        </div>
+                        <div class="row mt8">
+                            <div class="col-lg-8">
+                                <span class="text-muted" style="font-size:0.82rem;">
+                                    On the configured date, any cart item found in the customer's wishlist
+                                    (in stock or sell-out-of-stock) will automatically receive the discount
+                                    when they open their cart.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+
+            </xpath>
+        </field>
+    </record>
+</odoo>

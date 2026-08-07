@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        ══════════════════════════════════════════════════════════════════
+        Extend product_price template — inject "(After a X% discount)"
+        badge inside the product_price_container div, immediately after
+        the oe_default_price strikethrough span.
+
+        Structure in parent (website_sale.product_price):
+          <div name="product_price_container" ...>
+              <span class="oe_price">         ← current price
+              <span class="oe_default_price">  ← strikethrough list_price  ← INJECT AFTER HERE
+              <t t-if tax_indication .../>
+              <del name="product_price_strikethrough" ...>  ← compare_list_price
+          </div>
+
+        We inject only when has_discounted_price is True (pricelist discount active).
+        The % is computed server-side from (list_price - price)/list_price * 100.
+        The JS patch keeps this in sync on variant changes.
+        ══════════════════════════════════════════════════════════════════
+    -->
+    <template
+        id="product_price_discount_clarity"
+        inherit_id="website_sale.product_price"
+        name="Discount Clarity - After Discount Percentage Badge"
+    >
+        <!-- For pricelist discount (has_discounted_price is True) -->
+        <xpath
+            expr="//span[@name='product_list_price']"
+            position="after"
+        >
+            <t t-set="cp_list" t-value="combination_info.get('list_price', 0)"/>
+            <t t-set="cp_price" t-value="combination_info.get('price', 0)"/>
+            <t t-if="combination_info.get('has_discounted_price') and cp_list and cp_price and cp_list &gt; cp_price">
+                <t t-set="discount_pct" t-value="int(round((cp_list - cp_price) / cp_list * 100))"/>
+                <t t-if="discount_pct &gt; 0">
+                    <span
+                        name="o_custom_discount_clarity"
+                        class="o_custom_discount_clarity badge text-bg-success ms-1 align-middle"
+                        style="font-size: 0.72rem; font-weight: 600; white-space: nowrap;"
+                    >
+                        (<t t-out="discount_pct"/>% OFF)
+                    </span>
+                </t>
+            </t>
+        </xpath>
+
+        <!-- For comparison price (compare_list_price is active) -->
+        <xpath
+            expr="//del[@name='product_price_strikethrough']"
+            position="after"
+        >
+            <t t-set="cp_compare" t-value="combination_info.get('compare_list_price', 0)"/>
+            <t t-set="cp_price" t-value="combination_info.get('price', 0)"/>
+            <t t-if="not combination_info.get('has_discounted_price') and cp_compare and cp_price and cp_compare &gt; cp_price">
+                <t t-set="discount_pct" t-value="int(round((cp_compare - cp_price) / cp_compare * 100))"/>
+                <t t-if="discount_pct &gt; 0">
+                    <span
+                        name="o_custom_discount_clarity"
+                        class="o_custom_discount_clarity badge text-bg-success ms-1 align-middle"
+                        style="font-size: 0.72rem; font-weight: 600; white-space: nowrap;"
+                    >
+                        (<t t-out="discount_pct"/>% OFF)
+                    </span>
+                </t>
+            </t>
+        </xpath>
+    </template>
+
+    <!--
+        ══════════════════════════════════════════════════════════════════
+        Extend products_item (shop listing card) — inject the discount
+        percentage badge immediately after the strikethrough base_price
+        <del> block.
+
+        Structure in parent (website_sale.products_item):
+          <div class="product_price" ...>
+              <span>price_reduce</span>          ← discounted price
+              <t name="product_base_price">       ← only rendered when base > reduce
+                  <del>base_price</del>           ← strikethrough ← INJECT AFTER HERE
+              </t>
+          </div>
+
+        template_price_vals is available in this context.
+        ══════════════════════════════════════════════════════════════════
+    -->
+    <template
+        id="shop_listing_discount_clarity"
+        inherit_id="website_sale.products_item"
+        name="Discount Clarity - Shop Listing Badge"
+    >
+        <xpath expr="//t[@name='product_base_price']" position="after">
+            <t t-set="tile_base" t-value="template_price_vals.get('base_price', 0) if template_price_vals else 0"/>
+            <t t-set="tile_price" t-value="template_price_vals.get('price_reduce', 0) if template_price_vals else 0"/>
+            <t t-if="tile_base and tile_price and tile_base &gt; tile_price">
+                <t t-set="tile_discount_pct" t-value="int(round((tile_base - tile_price) / tile_base * 100))"/>
+                <t t-if="tile_discount_pct &gt; 0">
+                    <span
+                        class="o_custom_discount_clarity_tile badge text-bg-success ms-1 align-middle"
+                        style="font-size: 0.70rem; font-weight: 600; white-space: nowrap; vertical-align: middle;"
+                    >
+                        <t t-out="tile_discount_pct"/>% OFF
+                    </span>
+                </t>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="cart_lines_discount_clarity" inherit_id="website_sale.cart_lines" name="Cart Lines Discount Clarity">
+        <xpath expr="//t[@t-call='website_sale.cart_line_description_following_lines']" position="after">
+            <t t-if="line.discount &gt; 0">
+                <div class="mt-1">
+                    <span class="badge text-bg-warning" style="font-size: 0.75rem;">
+                        <i class="fa fa-tag"/> <t t-out="int(line.discount)"/>% Discount Applied
+                    </span>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="intern_applicant_view_search_dashboard_options" model="ir.ui.view">
+        <field name="name">intern.applicant.search.dashboard.options</field>
+        <field name="model">intern.applicant</field>
+        <field name="inherit_id" ref="recruitment_stages_status_enhancement.view_intern_applicant_search"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="create_date" string="Application Date"/>
+
+                <filter name="dashboard_group_by_application_month"
+                        string="Application Month"
+                        context="{'group_by': 'create_date:month'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

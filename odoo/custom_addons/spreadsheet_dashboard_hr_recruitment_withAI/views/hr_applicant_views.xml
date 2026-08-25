@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_applicant_view_form_dashboard_university" model="ir.ui.view">
+        <field name="name">hr.applicant.form.dashboard.university</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="after">
+                <field name="dashboard_university_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_view_search_dashboard_university" model="ir.ui.view">
+        <field name="name">hr.applicant.search.dashboard.university</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_search"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="after">
+                <field name="dashboard_university_id"/>
+            </xpath>
+            <xpath expr="//search" position="inside">
+                <field name="create_date" string="Application Date"/>
+
+                <filter name="dashboard_filter_active_applicants"
+                        string="Active Applicants"
+                        domain="[('active', '=', True), ('date_closed', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="dashboard_group_by_university"
+                        string="University"
+                        context="{'group_by': 'dashboard_university_id'}"/>
+
+                <filter name="dashboard_group_by_application_month"
+                        string="Application Month"
+                        context="{'group_by': 'create_date:month'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

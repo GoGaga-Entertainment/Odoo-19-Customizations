@@ -6,6 +6,7 @@
 # 1. Python Virtual Environments
 # ------------------------------------------------------
 odoo19/
+venv/
 .odoo19/
 env/
 ENV/

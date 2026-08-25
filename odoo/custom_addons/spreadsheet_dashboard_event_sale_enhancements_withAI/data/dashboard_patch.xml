@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <function
+            model="spreadsheet.dashboard"
+            name="_apply_event_customer_acquisition_dashboard"
+        >
+            <value eval="[ref('spreadsheet_dashboard_event_sale.spreadsheet_dashboard_events')]"/>
+        </function>
+    </data>
+</odoo>

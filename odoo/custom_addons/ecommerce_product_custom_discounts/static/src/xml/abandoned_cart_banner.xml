@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="ecommerce_product_custom_discounts.abandoned_cart_banner">
+        <div class="alert mb-3 d-flex align-items-center gap-3"
+             style="background: linear-gradient(135deg, #fff8e1 0%, #fffde7 100%);
+                    border: 1.5px solid #ffe082;
+                    border-radius: 8px;">
+            <i class="fa fa-tag fa-lg flex-shrink-0" style="color:#f57f17;" aria-hidden="true"/>
+            <div>
+                <strong style="color:#e65100; font-size:0.95rem;">
+                    Special offer: <t t-out="discount_pct"/>% off your cart!
+                </strong>
+                <div style="color:#6d4c41; font-size:0.82rem; margin-top:2px;">
+                    Complete your purchase before this offer expires — up to
+                    <t t-out="max_discount"/>% discount available.
+                    Expires in: <strong class="o_cart_banner_timer">--:--:--</strong>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

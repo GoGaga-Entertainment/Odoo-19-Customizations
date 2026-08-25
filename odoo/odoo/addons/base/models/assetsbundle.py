@@ -967,8 +967,8 @@ class StylesheetAsset(WebAsset):
         content = self.rx_sourceMap.sub('', self.content)
         # comments
         content = re.sub(r'/\*.*?\*/', '', content, flags=re.S)
-        # space
-        content = re.sub(r'\s+', ' ', content)
+        # space — use split/join instead of re.sub for performance on large bundles
+        content = ' '.join(content.split())
         content = re.sub(r' *([{}]) *', r'\1', content)
         return self.with_header(content)
 

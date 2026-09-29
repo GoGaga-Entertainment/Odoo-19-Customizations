@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <!--
+        OWL template for the custom "Back in Stock Message".
+        Rendered client-side by back_in_stock_mixin.js when:
+          - is_storable is true
+          - free_qty > 0 (product IS in stock)
+          - back_in_stock_message is non-empty
+
+        Displayed inside .availability_messages div, below the default
+        "X Units in stock" threshold badge from website_sale_stock.
+    -->
+    <t t-name="ecommerce_product_custom_discounts.back_in_stock_message">
+        <div
+            t-if="is_storable and back_in_stock_message"
+            id="o_custom_back_in_stock_msg"
+            class="mt-2 mb-3"
+        >
+            <div
+                class="d-flex align-items-start gap-2 px-3 py-2"
+                style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+                       border: 1.5px solid #a5d6a7;
+                       border-radius: 8px;"
+            >
+                <!-- Styled green check icon -->
+                <i
+                    class="fa fa-check-circle mt-1 flex-shrink-0"
+                    style="color: #2e7d32; font-size: 1rem;"
+                    aria-hidden="true"
+                />
+                <span
+                    style="color: #1b5e20; font-size: 0.875rem; font-weight: 500;"
+                    t-out="back_in_stock_message"
+                />
+            </div>
+        </div>
+    </t>
+</templates>

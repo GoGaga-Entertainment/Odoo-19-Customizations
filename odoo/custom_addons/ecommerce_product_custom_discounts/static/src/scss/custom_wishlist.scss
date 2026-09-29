@@ -1,0 +1,29 @@
+/**
+ * ecommerce_product_custom_discounts — custom_wishlist.scss
+ *
+ * Adds proper vertical spacing on the /shop/wishlist page:
+ *   1. Between the "My Wishlist" h1 and the special-day discount banner.
+ *   2. Between the discount banner and the product image/rows below.
+ *
+ * The banner is injected by wishlist_special_day.js using the class
+ * .o_custom_wishlist_day_banner, so we can target it safely here without
+ * touching any Odoo core layout classes.
+ */
+
+// ── Wishlist page spacing ────────────────────────────────────────────────────
+
+// Space ABOVE the banner (between h1 "My Wishlist" and the banner).
+// The banner is inserted immediately after the h1 via insertAdjacentHTML('afterend').
+// Adding margin-top here achieves the required 20–25 px gap.
+.o_custom_wishlist_day_banner {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+// ── Responsive: slightly tighten gap on small screens ───────────────────────
+@media (max-width: 575.98px) {
+    .o_custom_wishlist_day_banner {
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
+}

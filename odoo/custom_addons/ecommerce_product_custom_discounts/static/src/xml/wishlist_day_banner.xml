@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="ecommerce_product_custom_discounts.wishlist_day_banner">
+        <div class="d-flex align-items-start gap-2 px-3 py-2 mb-3"
+             style="background: linear-gradient(135deg, #fce4ec 0%, #ffeeff 100%);
+                    border: 1.5px solid #f48fb1;
+                    border-radius: 8px;">
+            <i class="fa fa-heart mt-1 flex-shrink-0" style="color:#c2185b;" aria-hidden="true"/>
+            <div>
+                <strong style="color:#880e4f; font-size:0.95rem;">
+                    Today is your special day! Enjoy <t t-out="discount_pct"/>% off
+                    everything in your wishlist.
+                </strong>
+                <div style="color:#6d4c41; font-size:0.82rem; margin-top:2px;">
+                    Add any wishlist item to your cart today to redeem the discount.
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

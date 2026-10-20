@@ -1,0 +1,59 @@
+.o_forecast_aov_row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+    line-height: 20px;
+    white-space: nowrap;
+}
+
+/*
+ * Preferred marker path (see forecast_aov_tooltip.js): the JS clones the
+ * real "Actual Revenue" marker element and only recolors it. No size/shape
+ * rules are set here on purpose — the clone already matches the blue
+ * marker pixel-for-pixel because it IS the same kind of element. Only
+ * pin its flex behavior so the row's flexbox can't stretch or shrink it.
+ */
+.o_forecast_aov_marker_clone {
+    flex: 0 0 auto !important;
+}
+
+/*
+ * Fallback marker, used only if the native marker element could not be
+ * found and cloned at runtime (e.g. a future Odoo version changes the
+ * tooltip markup). Forces a 20x20 square to match the native marker.
+ */
+.o_forecast_aov_marker {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+    min-height: 18px !important;
+    max-height: 18px !important;
+    flex: 0 0 20px !important;
+    aspect-ratio: 1 / 1 !important;
+    display: inline-block !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background: #7b61a8 !important;
+}
+
+.o_forecast_aov_label {
+    color: #434343;
+}
+
+.o_forecast_aov_value {
+    margin-left: auto;
+    padding-left: 8px;
+    font-weight: 700;
+    color: #434343;
+}
+/* Mode Product and Frequency are separate rows using the shared native
+   tooltip row structure. Each gets its own marker and right-aligned value. */
+.o_forecast_aov_row_mode_product,
+.o_forecast_aov_row_mode_frequency {
+    display: flex;
+    align-items: center;
+}

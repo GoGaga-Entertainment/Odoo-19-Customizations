@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_forecast_point_user,sale.forecast.point user,model_sale_forecast_point,base.group_user,1,0,0,0
+access_sale_forecast_summary_user,sale.forecast.summary user,model_sale_forecast_summary,base.group_user,1,0,0,0
+access_sale_forecast_validation_point_user,sale.forecast.validation.point user,model_sale_forecast_validation_point,base.group_user,1,0,0,0
+access_sale_forecast_validation_summary_user,sale.forecast.validation.summary user,model_sale_forecast_validation_summary,base.group_user,1,0,0,0

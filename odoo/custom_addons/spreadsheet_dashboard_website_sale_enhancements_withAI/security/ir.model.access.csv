@@ -1,2 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_website_sale_customer_acquisition_user,website.sale.customer.acquisition.user,model_website_sale_customer_acquisition,base.group_user,1,0,0,0
+access_website_sale_forecast_point_user,website.sale.forecast.point user,model_website_sale_forecast_point,base.group_user,1,0,0,0
+access_website_sale_forecast_summary_user,website.sale.forecast.summary user,model_website_sale_forecast_summary,base.group_user,1,0,0,0
+access_website_sale_forecast_validation_point_user,website.sale.forecast.validation.point user,model_website_sale_forecast_validation_point,base.group_user,1,0,0,0
+access_website_sale_forecast_validation_summary_user,website.sale.forecast.validation.summary user,model_website_sale_forecast_validation_summary,base.group_user,1,0,0,0
+access_website_sale_forecast_point_system,website.sale.forecast.point system,model_website_sale_forecast_point,base.group_system,1,0,0,0
+access_website_sale_forecast_summary_system,website.sale.forecast.summary system,model_website_sale_forecast_summary,base.group_system,1,0,0,0
+access_website_sale_forecast_validation_point_system,website.sale.forecast.validation.point system,model_website_sale_forecast_validation_point,base.group_system,1,0,0,0
+access_website_sale_forecast_validation_summary_system,website.sale.forecast.validation.summary system,model_website_sale_forecast_validation_summary,base.group_system,1,0,0,0

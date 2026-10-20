@@ -90,3 +90,54 @@ Included final fixes:
 - Sales-style Top Countries Map / Top 10 carousel.
 - Top 10 country values backed by the Events sales pivot.
 - Archived Event Status shown after Ended.
+
+## AI forecast section (v19.0.1.11.0)
+
+Mirrors the Sales "withAI" dashboard, applied to Events. Everything is added in
+memory at read time (same architecture as above); stock addon files are not
+modified and nothing is written to `spreadsheet.dashboard`.
+
+New dashboard content, in this order: KPI cards -> Monthly Sales -> AI forecast block -> Top Countries / Events Status / tables (existing content is pushed down by `models/event_dashboard_layout.py`):
+- **Monthly Event Sales** area chart (series label "Untaxed Total") (event sales only, `event.sale.report`, sold).
+- **Forecast Period** filter (7 Days, 1 Month, 6 Months, 1/2/5/10 Years; default 1 Month).
+- **Overall Event Sales Forecast** - actual vs forecast revenue.
+- **Overall Event Sales Forecast (ML Algorithms)** - ARIMA, Exponential
+  Smoothing, Linear Regression, Polynomial Regression.
+- **Training Data / Testing Data / Best Performing Model** cards (80/20
+  chronological back-test, MAPE based) and a **Trained & Tested** chart.
+- Filter wiring: the **Forecast Period** filter drives ONLY the three forecast charts
+  (AOV, ML Algorithms, Trained & Tested). **Monthly Sales** is wired ONLY to the dashboard
+  **Date** filter, matched on the chart's own x-axis date field, so stock Odoo also drives its
+  in-graph Days/Months/... choices and automatic default from the Date filter.
+- Months/Quarters/Days chart granularity of the forecast charts follows the Forecast Period
+  (`static/src/js/event_forecast_axis_filter.js`).
+
+Data source: event sales only, bucketed by SALE date (not event date), so a
+ticket sold in September for an October event counts in September.
+Primary = confirmed `sale.order.line` rows that carry an event (order date).
+Fallback = `event.sale.report` (sold) by its sale/registration date field.
+Monthly Sales uses the same sale-date basis when the report exposes such a field.
+Series are labelled "Actual Event Revenue" / "Forecast Event Revenue" so the Sales AI
+module's tooltip script (which decorates tooltips containing "Actual Revenue" with
+whole-company Sales data) never touches Events charts.
+If the forecast cannot be built, the Best Performing Model card says why.
+
+Verify the numbers (psql): monthly event revenue by order date
+    SELECT to_char(date_trunc('month', so.date_order),'YYYY-MM') AS month,
+           round(sum(sol.price_subtotal)) AS revenue, count(DISTINCT so.id) AS orders
+      FROM sale_order_line sol JOIN sale_order so ON so.id = sol.order_id
+     WHERE sol.event_id IS NOT NULL AND so.state = 'sale' GROUP BY 1 ORDER BY 1;
+and what the chart stored:
+    SELECT date, round(revenue) FROM event_forecast_point
+     WHERE forecast_period = '1_month' AND series = 'actual' ORDER BY date;
+
+Files added: `models/event_dashboard_layout.py`, `models/event_monthly_sales_patch.py`, `models/event_forecast_engine.py`, `models/event_forecast.py`,
+`models/event_forecast_patch.py`, `models/event_forecast_dashboard.py`,
+`static/src/js/event_forecast_axis_filter.js`, four read-only ACL lines.
+
+Requirements (Odoo Python env): `pip install numpy scipy scikit-learn statsmodels`.
+Forecast helper rows are rebuilt per user/company at most every 10 minutes, or
+immediately when event sales change. A forecast failure never breaks the
+dashboard (it is logged and the dashboard is served without the block).
+
+Upgrade: `-u spreadsheet_dashboard_event_sale_enhancements_withAI`, then hard-refresh the browser.

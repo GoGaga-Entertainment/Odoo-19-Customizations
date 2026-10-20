@@ -15,26 +15,13 @@ TARGET_DASHBOARD_XMLID = "spreadsheet_dashboard_sale.spreadsheet_dashboard_sales
 
 
 class SpreadsheetDashboard(models.Model):
-    """Extends the stock dashboard model (defined in ``spreadsheet_dashboard``)
-    to inject four additional KPIs into the standard "Sales" dashboard.
+    """Extends the standard Odoo Sales spreadsheet dashboard.
 
-    This overrides ``_get_serialized_readonly_dashboard``, the single method
-    the ``/spreadsheet/dashboard/data/<dashboard>`` controller
-    (spreadsheet_dashboard/controllers/dashboards_controllers.py) calls to
-    produce the JSON served to the browser. The patch is applied to the
-    in-memory payload only, on every request, for the Sales dashboard record
-    alone:
-
-    - Nothing is written back to the database, so the change is immune to
-      ``spreadsheet_dashboard_sale`` being upgraded/reinstalled later (its
-      data file would otherwise reset any stored patch).
-    - Every other dashboard record is returned completely untouched,
-      including the "Product" dashboard also shipped by
-      spreadsheet_dashboard_sale.
-    - The "empty database" sample-dashboard code path in the base controller
-      (``_dashboard_is_empty`` / ``sample_dashboard_file_path``) bypasses
-      this method entirely, so the sample/preview dashboard shown before any
-      real sale order exists is intentionally left as shipped.
+    The forecast helper records are refreshed before the dashboard snapshot is
+    patched.  The Forecast Period global filter is client-side and selects one
+    of the already-generated horizons; changing it therefore updates the
+    chart/KPIs without rebuilding the dashboard or changing the native Sales
+    filters.
     """
     _inherit = "spreadsheet.dashboard"
 
@@ -45,13 +32,30 @@ class SpreadsheetDashboard(models.Model):
         if not target or self.id != target.id:
             return result
 
+        forecast_context = {
+            "company_id": self.env.company.id,
+            "owner_id": self.env.user.id,
+        }
+
+        # Refresh all forecast horizons.  This is intentionally best-effort:
+        # a forecast failure must never remove the native Sales dashboard.
+        try:
+            validation_context = self.env["sale.forecast.point"].refresh_for_dashboard()
+            forecast_context["validation"] = validation_context or {}
+        except Exception:
+            _logger.exception(
+                "spreadsheet_dashboard_sale_enhancements_withAI: forecast "
+                "refresh failed; serving the dashboard with existing forecast rows."
+            )
+            forecast_context["validation"] = {}
+
         try:
             payload = json.loads(result)
-            payload["snapshot"] = patch_sales_dashboard_json(payload["snapshot"])
+            payload["snapshot"] = patch_sales_dashboard_json(
+                payload["snapshot"], forecast_context=forecast_context
+            )
             return json.dumps(payload)
         except Exception:
-            # Never let a patching bug break the standard Sales dashboard -
-            # fall back to the unmodified, stock payload.
             _logger.exception(
                 "spreadsheet_dashboard_sale_enhancements_withAI: failed to "
                 "patch the Sales dashboard JSON, serving the stock dashboard instead."

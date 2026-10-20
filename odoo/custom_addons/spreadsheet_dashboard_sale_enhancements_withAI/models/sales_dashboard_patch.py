@@ -41,6 +41,8 @@ Everything here is additive: no existing pivot, cell, figure or global
 filter is modified or removed.
 """
 
+import math
+
 # Pivot ids already used by spreadsheet_dashboard_sale: "3".."12".
 NEW_CANCELLATION_PIVOT_ID = "13"
 
@@ -60,6 +62,34 @@ NEW_KPI_FIGURE_IDS = {
 
 TOP_PRODUCTS_PIVOT_ID = "6"          # stock "Product" pivot, already sorted desc by price_subtotal
 POSITIVE_PRODUCT_REVENUE_PIVOT_ID = "14"  # all positive product revenue, same current-period/global filters
+
+# AI revenue forecast additions.  The selection global filter affects only
+# the forecast summary pivot and forecast chart; the existing Sales dashboard
+# filters/pivots remain untouched.
+FORECAST_SUMMARY_PIVOT_ID = "15"
+FORECAST_FILTER_ID = "f7c6f2f1-7f8f-4e0f-a0fd-3a3a8a7e0f21"
+FORECAST_CHART_ID = "1a4b7f9c-2f8e-4c13-9a6e-2e8b7b1c4d55"
+ES_FORECAST_CHART_ID = "8e2f7c41-6a95-4d30-b18e-52c7f9a6d184"
+VALIDATION_CHART_ID = "6c4a1f82-9d7e-4b13-a5f0-2e8c6d7b1a90"
+VALIDATION_TRAIN_SCORECARD_ID = "1f4e8a72-3c9d-4b15-a6e0-7d2c5f9b8a31"
+VALIDATION_TEST_SCORECARD_ID = "2a5d9c73-1e8b-4f26-b7d0-6c3a8e5f1b42"
+VALIDATION_BEST_SCORECARD_ID = "3b6e0a84-2f9c-4d17-a8e1-5c7b9f2d6a43"
+VALIDATION_SUMMARY_PIVOT_ID = "16"
+FORECAST_SCORECARD_IDS = {
+    "current": "9b2b0f0c-8c91-4d35-b7b0-4b6b5e0f1a11",
+    "forecast": "d1d9c9a7-6f35-4a9a-93e0-8c5a6a2b7e22",
+    "growth": "e8f7b6c5-4d32-4f10-a9b8-7c6d5e4f3a33",
+    "confidence": "f6e5d4c3-b2a1-4f09-8e7d-6c5b4a3d2e44",
+}
+FORECAST_HORIZONS = (
+    ("7_days", "7 Days"),
+    ("1_month", "1 Month"),
+    ("6_months", "6 Months"),
+    ("1_year", "1 Year"),
+    ("2_years", "2 Years"),
+    ("5_years", "5 Years"),
+    ("10_years", "10 Years"),
+)
 CURRENT_PERIOD_STATS_PIVOT_ID = "11"  # stock "so stats - current"
 PREVIOUS_PERIOD_STATS_PIVOT_ID = "12"  # stock "so stats - previous"
 CUSTOMER_PIVOT_ID = "4"              # stock "Customer" pivot (partner_id rows, current period)
@@ -75,7 +105,7 @@ def _copy_field_matching(pivots, pivot_id):
     return copy.deepcopy(pivots[pivot_id]["fieldMatching"])
 
 
-def patch_sales_dashboard_json(data):
+def patch_sales_dashboard_json(data, forecast_context=None):
     """Return a patched copy of the Sales dashboard snapshot dict.
 
     ``data`` is the already-``json.loads``-ed spreadsheet snapshot as
@@ -97,9 +127,36 @@ def patch_sales_dashboard_json(data):
     _add_cancellation_pivot(pivots)
     _add_positive_product_revenue_pivot(pivots)
     _add_data_sheet_helper_cells(data_sheet)
+    _add_forecast_summary_pivot(pivots, forecast_context or {})
+    _add_validation_summary_pivot(pivots, forecast_context or {})
+    _add_forecast_global_filter(data)
     _add_kpi_scorecards(dashboard_sheet)
+    _add_forecast_section(dashboard_sheet, data_sheet, forecast_context or {})
+    _add_training_testing_section(dashboard_sheet, forecast_context or {})
+    _add_training_testing_helper_cells(data_sheet, dashboard_sheet)
     _add_contribution_table(dashboard_sheet, data)
     _register_menu_references(data)
+
+    # Odoo 19 o-spreadsheet requires every imported cell content to be a
+    # string. Some dashboard snapshots contain legacy cell objects such as
+    # {"content": "=...", "style": ...}; passing those objects through causes
+    # CellPlugin.createCell() to call startsWith() on a dict and crash. Keep
+    # styles in the sheet-level style map and normalize only the cell payload.
+    for sheet in data.get("sheets", []):
+        cell_map = sheet.get("cells")
+        if isinstance(cell_map, dict):
+            for address, value in list(cell_map.items()):
+                if isinstance(value, dict):
+                    if "content" in value:
+                        cell_map[address] = value.get("content") or ""
+                    elif "value" in value:
+                        cell_map[address] = str(value.get("value") or "")
+                    else:
+                        cell_map[address] = ""
+                elif value is None:
+                    cell_map[address] = ""
+                elif not isinstance(value, str):
+                    cell_map[address] = str(value)
 
     try:
         data["pivotNextId"] = str(max(int(k) for k in pivots.keys()) + 1)
@@ -560,6 +617,664 @@ def _add_contribution_table(dashboard_sheet, data):
             "style": {"textColor": "#00A04A"},  # same "up" green used by the KPI cards
         },
     })
+
+
+
+def _add_forecast_summary_pivot(pivots, forecast_context):
+    """Add a tiny pivot used by the four AI forecast scorecards."""
+    if FORECAST_SUMMARY_PIVOT_ID in pivots:
+        return
+
+    # The owner/company domain is added by the server when the snapshot is
+    # built. It is deliberately narrow so one user's generated forecast rows
+    # can never appear in another user's dashboard.
+    company_id = int(forecast_context.get("company_id") or 0)
+    owner_id = int(forecast_context.get("owner_id") or 0)
+
+    pivots[FORECAST_SUMMARY_PIVOT_ID] = {
+        "type": "ODOO",
+        "fieldMatching": {
+            FORECAST_FILTER_ID: {
+                "chain": "forecast_period",
+                "type": "selection",
+            },
+        },
+        "context": {"group_by": []},
+        "domain": [
+            ["company_id", "=", company_id],
+            ["owner_id", "=", owner_id],
+        ],
+        "id": FORECAST_SUMMARY_PIVOT_ID,
+        "measures": [
+            
+        ],
+        "model": "sale.forecast.summary",
+        "name": "AI sales forecast summary",
+        "sortedColumn": None,
+        "formulaId": FORECAST_SUMMARY_PIVOT_ID,
+        "columns": [],
+        "rows": [],
+    }
+
+
+
+def _add_validation_summary_pivot(pivots, forecast_context):
+    """Pivot of filter-aware back-test metrics used by the Best Model card."""
+    if VALIDATION_SUMMARY_PIVOT_ID in pivots:
+        return
+    company_id = int(forecast_context.get("company_id") or 0)
+    owner_id = int(forecast_context.get("owner_id") or 0)
+    pivots[VALIDATION_SUMMARY_PIVOT_ID] = {
+        "type": "ODOO",
+        "fieldMatching": {
+            FORECAST_FILTER_ID: {"chain": "forecast_period", "type": "selection"},
+        },
+        "context": {"group_by": []},
+        "domain": [["company_id", "=", company_id], ["owner_id", "=", owner_id]],
+        "id": VALIDATION_SUMMARY_PIVOT_ID,
+        "measures": [
+            {"id": "mape", "fieldName": "mape", "userDefinedName": "MAPE"},
+            {"id": "mae", "fieldName": "mae", "userDefinedName": "MAE"},
+            {"id": "rmse", "fieldName": "rmse", "userDefinedName": "RMSE"},
+        ],
+        "model": "sale.forecast.validation.summary",
+        "name": "Sales forecast validation summary",
+        "sortedColumn": None,
+        "formulaId": VALIDATION_SUMMARY_PIVOT_ID,
+        "columns": [],
+        "rows": [{"fieldName": "model_name"}],
+    }
+
+def _add_forecast_global_filter(data):
+    """Add the only user-facing AI forecast filter: future forecast period."""
+    filters = data.setdefault("globalFilters", [])
+    filters[:] = [flt for flt in filters if flt.get("id") != FORECAST_FILTER_ID]
+
+    graph_field = {
+        "field": "forecast_period",
+        "type": "selection",
+    }
+    filters.append({
+        "id": FORECAST_FILTER_ID,
+        "type": "selection",
+        "label": "Forecast Period",
+        # Odoo 19 selection filters use ``resModel`` and ``selectionField``
+        # for the search-bar facet/value-label lookup.  ``modelName`` is used
+        # by relation filters, not selection filters.
+        "resModel": "sale.forecast.summary",
+        "selectionField": "forecast_period",
+        # 1 Month is the default user-facing forecast period. The historical
+        # back-test points are retained inside every future horizon, so the
+        # default view shows past actual + past forecast + the next month
+        # forecast without exposing an internal Historical filter option.
+        "defaultValue": {
+            "operator": "in",
+            "selectionValues": ["1_month"],
+        },
+        "pivotFields": {
+            FORECAST_SUMMARY_PIVOT_ID: dict(graph_field),
+            VALIDATION_SUMMARY_PIVOT_ID: dict(graph_field),
+        },
+        "listFields": {},
+        "graphFields": {
+            FORECAST_CHART_ID: dict(graph_field),
+            ES_FORECAST_CHART_ID: dict(graph_field),
+            VALIDATION_CHART_ID: dict(graph_field),
+        },
+    })
+
+
+def _add_forecast_section(dashboard_sheet, data_sheet, forecast_context):
+    """Insert the AI forecast panel immediately above Monthly Sales."""
+    figures = dashboard_sheet.setdefault("figures", [])
+
+    # Remove previous copies defensively.  IMPORTANT: older iterations of this
+    # addon used different IDs for the ML chart.  The dashboard snapshot is
+    # persistent, so simply replacing the current ID leaves those old ML
+    # charts in the workbook.  That is exactly what caused an old empty
+    # 0..1 chart to remain visible even after the data source was fixed.
+    # Remove by both ID/chartId AND by the ML title so every legacy copy is
+    # eliminated before adding exactly one current ML chart.
+    legacy_ml_chart_ids = {
+        ES_FORECAST_CHART_ID,
+        "5d7e9a11-3c42-4a86-b1d2-6f9c0e8a4b77",
+        "f9c3a7e2-8b41-4d65-9c20-1a7f6e3b5d84",
+        "7b6e4d2a-91f8-4c35-a7e0-6d2b9f1c8453",
+        "2c91f7a4-6e35-4b82-9d10-5f73c8e2a641",
+        "8e2f7c41-6a95-4d30-b18e-52c7f9a6d184",
+    }
+    injected_ids = set(FORECAST_SCORECARD_IDS.values()) | {
+        FORECAST_CHART_ID, "overall_sales_forecast_title", *legacy_ml_chart_ids
+    }
+
+    def _is_legacy_ml_figure(fig):
+        if fig.get("id") in injected_ids:
+            return True
+        fig_data = fig.get("data") or {}
+        if fig_data.get("chartId") in injected_ids:
+            return True
+        title = fig_data.get("title") or {}
+        title_text = title.get("text") if isinstance(title, dict) else title
+        return title_text == "Overall Sales Forecast (ML Algorithms)"
+
+    figures[:] = [fig for fig in figures if not _is_legacy_ml_figure(fig)]
+
+    monthly = None
+    for fig in figures:
+        fig_data = fig.get("data", {})
+        if (
+            fig.get("tag") == "chart"
+            and fig_data.get("type") == "odoo_line"
+            and fig.get("offset", {}).get("x", 0) == 0
+        ):
+            monthly = fig
+            break
+
+    if monthly is None:
+        return
+
+    monthly_y = monthly.get("offset", {}).get("y", 0)
+
+    # Restore the native Monthly Sales heading explicitly. Some Odoo 19
+    # dashboard snapshots omit the chart title even though the chart itself
+    # remains present, leaving the first graph looking unlabelled.
+    import copy
+    monthly_data = monthly.setdefault("data", {})
+    monthly_title = monthly_data.get("title")
+    if not isinstance(monthly_title, dict):
+        monthly_title = {}
+    else:
+        monthly_title = copy.deepcopy(monthly_title)
+    monthly_title.update({
+        "text": "Monthly Sales",
+        "bold": True,
+        "color": "#007A83",
+        "fontSize": 24,
+    })
+    monthly_data["title"] = monthly_title
+
+    # Add a small amount of breathing room above the Monthly Sales graph so
+    # its heading is visible and does not sit against the KPI cards.
+    monthly_nudge = 24
+    monthly.setdefault("offset", {})["y"] = monthly_y + monthly_nudge
+    monthly_y = monthly["offset"]["y"]
+
+    # Reserve a dedicated vertical block for the inserted forecast panels.
+    # The native Top Quotations / Top Sales Orders sections are cell-based
+    # content around row 35, so moving chart figures alone is not enough:
+    # enlarge the spacer row above those sections as well. This keeps the
+    # native tables from rendering through the custom forecast charts.
+    #
+    # Layout below Monthly Sales:
+    #   Overall Sales Forecast chart       330 px + 30 px gap
+    #   ML forecast chart                  330 px + 40 px gap
+    #   Training/testing cards              82 px + 18 px gap
+    #   Model Training & Testing chart     300 px
+    #   final clearance                     50 px
+    # The spacer is intentionally slightly generous for title/legend height.
+    custom_stack_height = 330 + 30 + 330 + 40 + 82 + 18 + 300 + 50
+    rows = dashboard_sheet.setdefault("rows", {})
+    row5 = rows.setdefault("5", {"size": 40})
+    row5["size"] = row5.get("size", 40) + custom_stack_height
+
+    # Shift native dashboard charts other than Monthly Sales below the
+    # complete custom block. Keep the Monthly Sales chart as the first chart.
+    for native_fig in figures:
+        if native_fig is monthly:
+            continue
+        native_data = native_fig.get("data") or {}
+        native_offset = native_fig.get("offset")
+        if (
+            native_fig.get("tag") == "chart"
+            and native_data.get("type") == "odoo_line"
+            and isinstance(native_offset, dict)
+            and native_offset.get("y", 0) >= monthly_y
+        ):
+            native_offset["y"] = native_offset.get("y", 0) + custom_stack_height
+
+    # Increase the sheet's declared row count to accommodate the new vertical
+    # space and preserve the native lower dashboard sections.
+    dashboard_sheet["rowNumber"] = max(
+        dashboard_sheet.get("rowNumber", 0),
+        dashboard_sheet.get("rowNumber", 0) + int(math.ceil(custom_stack_height / 28.0)) + 2,
+    )
+
+    # Size the Monthly Sales displacement from the actual forecast chart
+    # bounds instead of using a large fixed offset. This keeps Monthly Sales
+    # just below the forecast chart, even when the KPI layout changes.
+    card_height = 101
+    # Leave enough vertical clearance so the Monthly Sales chart title is not
+    # clipped/overlapped by the Overall Sales Forecast chart above it.
+    chart_gap = 40
+    chart_height = 330
+    kpi_figures_for_layout = [
+        fig for fig in figures
+        if fig.get("tag") == "chart"
+        and fig.get("data", {}).get("type") == "scorecard"
+    ]
+    kpi_bottom_for_layout = max(
+        (
+            fig.get("offset", {}).get("y", 0)
+            + fig.get("height", card_height)
+            for fig in kpi_figures_for_layout
+        ),
+        default=monthly_y + card_height,
+    )
+    # Put the native Monthly Sales chart first, immediately below the KPI cards.
+    # The forecast panels are positioned beneath it later in this function.
+    desired_monthly_y = kpi_bottom_for_layout + chart_gap
+    panel_shift = max(0, desired_monthly_y - monthly_y)
+    monthly["offset"]["y"] = monthly_y + panel_shift
+
+    rows = dashboard_sheet.setdefault("rows", {})
+    row5 = rows.setdefault("5", {"size": 40})
+    row5["size"] = row5.get("size", 40) + panel_shift
+
+    # Extend the logical grid so the shifted lower dashboard content remains
+    # inside the sheet's declared bounds.
+    dashboard_sheet["rowNumber"] = max(
+        dashboard_sheet.get("rowNumber", 0),
+        dashboard_sheet.get("rowNumber", 0) + int(math.ceil(panel_shift / 28.0)) + 2,
+    )
+
+    # Use exactly the same logical dimensions as the KPI cards created by
+    # _add_kpi_scorecards above.  The previous forecast cards used 245x92,
+    # which made them visibly wider than the native Sales KPI cards.
+    card_width = 210
+    card_height = 101
+    gap = 15
+    top_y = monthly_y
+
+    def _scorecard(chart_id, x, title, background, key_cell, baseline_cell):
+        return {
+            "id": chart_id,
+            "width": card_width,
+            "height": card_height,
+            "tag": "chart",
+            "offset": {"x": x, "y": top_y},
+            "col": 0,
+            "row": 0,
+            "data": {
+                "baselineMode": "text",
+                "baselineColorDown": "#DC6965",
+                "baselineColorUp": "#00A04A",
+                "title": {
+                    "text": title,
+                    "bold": True,
+                    "color": "#434343",
+                },
+                "type": "scorecard",
+                "background": background,
+                "baseline": f"Data!{baseline_cell}",
+                "keyValue": f"Data!{key_cell}",
+                "humanize": False,
+                "chartId": chart_id,
+            },
+        }
+
+    figures.extend([
+
+    ])
+
+    # Place the forecast chart directly below the bottom-most KPI scorecard.
+    # Previously this used ``monthly_y + card_height + 20``.  Since monthly_y
+    # is already below the KPI rows, that added an unnecessary extra card-height
+    # gap between the KPI cards and the Overall Sales Forecast chart.
+    kpi_figures = [
+        fig for fig in figures
+        if fig.get("tag") == "chart"
+        and fig.get("data", {}).get("type") == "scorecard"
+    ]
+    kpi_bottom = max(
+        (
+            fig.get("offset", {}).get("y", 0)
+            + fig.get("height", card_height)
+            for fig in kpi_figures
+        ),
+        default=top_y + card_height,
+    )
+    chart_y = monthly.get("offset", {}).get("y", 0) + monthly.get("height", 330) + 30
+    chart_width = monthly.get("width", 1095)
+
+    monthly_data = monthly.get("data", {})
+
+    # Match the visual style of the native "Monthly Sales" heading.
+    # The forecast heading is rendered by the chart itself, so explicitly
+    # apply the same heading treatment instead of using the smaller default
+    # chart-title styling.
+    native_chart_title = copy.deepcopy(monthly_data.get("title") or {})
+    native_chart_title.update({
+        "text": "Overall Sales Forecast (AOV)",
+        "bold": True,
+        "color": "#007A83",
+        "fontSize": 24,
+    })
+    # Keep the title inside forecast_chart_data. Do not append it as a
+    # standalone dashboard figure because FigureComponent requires a
+    # registered figure tag/type.
+
+    forecast_chart_data = {
+        # Exact native Monthly Sales chart title styling; only the text changes.
+        "title": native_chart_title,
+        "metaData": {
+            # Use the same monthly time grain as Monthly Sales. This gives the
+            # X-axis real calendar labels such as "Aug 2026", "Sep 2026", etc.
+            "groupBy": ["date:month", "series"],
+            "measure": "revenue",
+            "order": None,
+            "resModel": "sale.forecast.point",
+            "mode": "line",
+            "cumulatedStart": False,
+        },
+        "searchParams": {
+            "comparison": None,
+            "context": {"group_by": []},
+            "domain": _forecast_chart_domain(forecast_context),
+            "groupBy": ["date:month", "series"],
+            "orderBy": [],
+        },
+        "type": "odoo_line",
+        "dataSets": [{}],
+        "verticalAxisPosition": monthly_data.get("verticalAxisPosition", "left"),
+        "stacked": monthly_data.get("stacked", False),
+        "cumulatedStart": monthly_data.get("cumulatedStart", False),
+        "axesDesign": {
+            # Match Monthly Sales: the horizontal axis is self-labelled by
+            # calendar dates, while the vertical axis carries the Revenue title.
+            "y": {"title": {"text": "Revenue"}},
+        },
+        # Monthly Sales is an area chart.  Match that native visualization.
+        "fillArea": monthly_data.get("fillArea", True),
+        "chartId": FORECAST_CHART_ID,
+        "fieldMatching": {
+            FORECAST_FILTER_ID: {
+                "chain": "forecast_period",
+                "type": "selection",
+            },
+        },
+    }
+
+    # Copy only visual properties from Monthly Sales.  We deliberately do not
+    # copy its dataSets/metaData/searchParams because those are tied to
+    # sale.report and would point the forecast chart at the wrong model.
+    for visual_key in ("background", "legendPosition"):
+        if visual_key in monthly_data:
+            forecast_chart_data[visual_key] = monthly_data[visual_key]
+
+    figures.append({
+        "id": FORECAST_CHART_ID,
+        "width": chart_width,
+        "height": chart_height,
+        "tag": "chart",
+        "offset": {"x": 0, "y": chart_y},
+        "col": 0,
+        "row": 0,
+        "data": forecast_chart_data,
+    })
+
+    # ------------------------------------------------------------------
+    # ML/regression graph. The original Overall Sales Forecast (AOV) chart
+    # keeps Actual Revenue and the original Forecast Revenue only. Linear and
+    # Polynomial Regression are shown here alongside Exponential Smoothing
+    # and ARIMA. All series use the same sale.forecast.point source and
+    # Forecast Period filter.
+    # ------------------------------------------------------------------
+    es_chart_y = chart_y + chart_height + 40
+    es_chart_data = {
+        "title": {
+            "text": "Overall Sales Forecast (ML Algorithms)",
+            "bold": True,
+            "color": "#007A83",
+            "fontSize": 24,
+        },
+        "metaData": {
+            # Keep the same chart data shape as the proven forecast chart.
+            # The domain below limits this chart to the two ML time-series
+            # outputs, and grouping by series gives each model its own legend.
+            "groupBy": ["date:month", "series"],
+            "measure": "revenue",
+            "order": None,
+            "resModel": "sale.forecast.point",
+            "mode": "line",
+            "cumulatedStart": False,
+        },
+        "searchParams": {
+            "comparison": None,
+            "context": {"group_by": []},
+            "domain": _forecast_ml_chart_domain(forecast_context),
+            "groupBy": ["date:month", "series"],
+            "orderBy": [],
+        },
+        "type": "odoo_line",
+        "dataSets": [{}],
+        "verticalAxisPosition": monthly_data.get("verticalAxisPosition", "left"),
+        "stacked": False,
+        "cumulatedStart": False,
+        "axesDesign": {
+            "y": {"title": {"text": "Revenue"}},
+        },
+        "fillArea": False,
+        "chartId": ES_FORECAST_CHART_ID,
+        "fieldMatching": {
+            FORECAST_FILTER_ID: {
+                "chain": "forecast_period",
+                "type": "selection",
+            },
+        },
+    }
+    figures.append({
+        "id": ES_FORECAST_CHART_ID,
+        "width": chart_width,
+        "height": chart_height,
+        "tag": "chart",
+        "offset": {"x": 0, "y": es_chart_y},
+        "col": 0,
+        "row": 0,
+        "data": es_chart_data,
+    })
+
+    cells = data_sheet.setdefault("cells", {})
+    # Summary pivot 15 is filtered by Forecast Period.  Keep the scorecard
+    # values as strings so Odoo displays compact currency/percentage values
+    # exactly like the existing KPI cards.
+    cells["H20"] = f'=FORMAT.LARGE.NUMBER(PIVOT.VALUE({FORECAST_SUMMARY_PIVOT_ID},"current_revenue"))'
+    cells["H21"] = f'=FORMAT.LARGE.NUMBER(PIVOT.VALUE({FORECAST_SUMMARY_PIVOT_ID},"forecast_revenue"))'
+    cells["H22"] = (
+        f'=IFERROR(IF(PIVOT.VALUE({FORECAST_SUMMARY_PIVOT_ID},"growth_pct")>=0,"+","")'
+        f'&ROUND(PIVOT.VALUE({FORECAST_SUMMARY_PIVOT_ID},"growth_pct"),1)&"%","0%")'
+    )
+    cells["H23"] = (
+        f'=ROUND(PIVOT.VALUE({FORECAST_SUMMARY_PIVOT_ID},"confidence"),0)&"%"'
+    )
+
+
+
+
+def _add_training_testing_helper_cells(data_sheet, dashboard_sheet):
+    """Write validation scorecard values to the hidden Data sheet.
+
+    The dashboard scorecard renderer reliably displays values referenced as
+    ``Data!A1``-style workbook cells.  Keep this helper block isolated in Z:Z
+    so it cannot collide with the stock Sales dashboard helper formulas.
+    """
+    values = dashboard_sheet.pop("_validation_helper_cells", {})
+    if not values:
+        return
+    cells = data_sheet.setdefault("cells", {})
+    cells["Z1"] = values.get("training_pct", "0%")
+    cells["Z2"] = values.get("training_count", "0 days")
+    cells["Z3"] = values.get("testing_pct", "0%")
+    cells["Z4"] = values.get("testing_count", "0 days")
+    # Best-model values are formulas against the validation summary pivot, so
+    # the Forecast Period global filter changes them automatically.
+    # IMPORTANT: the value-lookup form of PIVOT.VALUE uses the actual field
+    # name ("model_name"), not the ranked-field form ("#model_name").
+    # Using "#model_name" here makes the lookup invalid and causes the
+    # scorecard to fall through to the em-dash even though pivot 16 has rows.
+    # The validation pivot is wired to the Forecast Period global filter, so
+    # these formulas automatically recalculate when the user changes 7 Days,
+    # 1 Month, 6 Months, etc.
+    arima_mape = (
+        f'PIVOT.VALUE({VALIDATION_SUMMARY_PIVOT_ID},"mape","model_name","ARIMA")'
+    )
+    es_mape = (
+        f'PIVOT.VALUE({VALIDATION_SUMMARY_PIVOT_ID},"mape","model_name","Exponential Smoothing")'
+    )
+    cells["Z6"] = (
+        f'=IFERROR(IF({arima_mape}<={es_mape},"ARIMA","Exponential Smoothing"),"—")'
+    )
+    cells["Z7"] = (
+        f'=IFERROR("MAPE: "&ROUND(MIN({arima_mape},{es_mape}),1)&"%","MAPE: —")'
+    )
+
+
+def _add_training_testing_section(dashboard_sheet, forecast_context):
+    """Add a compact filter-aware training/testing panel below the ML forecast."""
+    validation = forecast_context.get("validation") or {}
+    figures = dashboard_sheet.setdefault("figures", [])
+
+    injected_ids = {
+        VALIDATION_CHART_ID,
+        VALIDATION_TRAIN_SCORECARD_ID,
+        VALIDATION_TEST_SCORECARD_ID,
+        VALIDATION_BEST_SCORECARD_ID,
+    }
+    figures[:] = [fig for fig in figures if fig.get("id") not in injected_ids]
+
+    ml_chart = next((fig for fig in figures if fig.get("id") == ES_FORECAST_CHART_ID
+                     or (fig.get("data") or {}).get("chartId") == ES_FORECAST_CHART_ID), None)
+    if ml_chart is None:
+        return
+
+    ml_y = ml_chart.get("offset", {}).get("y", 0)
+    ml_height = ml_chart.get("height", 330)
+    chart_width = ml_chart.get("width", 1095)
+    section_y = ml_y + ml_height + 32
+
+    card_gap = 15
+    card_height = 82
+    training_pct = float(validation.get("training_percentage") or 0.0)
+    testing_pct = float(validation.get("testing_percentage") or 0.0)
+    training_count = int(validation.get("training_count") or 0)
+    testing_count = int(validation.get("testing_count") or 0)
+
+    validation_cells = dashboard_sheet.setdefault("_validation_helper_cells", {})
+    validation_cells.update({
+        "training_pct": f"{training_pct:.0f}%",
+        "training_count": f"{training_count} days",
+        "testing_pct": f"{testing_pct:.0f}%",
+        "testing_count": f"{testing_count} days",
+    })
+
+    # Three cards in one row. Give the Best Performing Model card extra
+    # width so the full "Exponential Smoothing" label remains readable
+    # instead of being truncated by the scorecard renderer.
+    split_width = (chart_width - 2 * card_gap) * 0.25
+    best_width = chart_width - (2 * split_width) - (2 * card_gap)
+
+    def split_card(fig_id, x, title, key_cell, baseline_cell, background):
+        return {
+            "id": fig_id, "width": split_width, "height": card_height,
+            "tag": "chart", "offset": {"x": x, "y": section_y},
+            "col": 0, "row": 0,
+            "data": {
+                "baselineMode": "text",
+                "title": {"text": title, "bold": True, "color": "#434343"},
+                "type": "scorecard", "background": background,
+                "keyValue": f"Data!{key_cell}",
+                "baseline": f"Data!{baseline_cell}",
+                "humanize": False, "chartId": fig_id,
+            },
+        }
+
+    figures.append(split_card(VALIDATION_TRAIN_SCORECARD_ID, 0, "Training Data", "Z1", "Z2", "#F0FDF4"))
+    figures.append(split_card(VALIDATION_TEST_SCORECARD_ID, split_width + card_gap, "Testing Data", "Z3", "Z4", "#EFF6FF"))
+    figures.append({
+        "id": VALIDATION_BEST_SCORECARD_ID,
+        "width": best_width, "height": card_height, "tag": "chart",
+        "offset": {"x": 2 * (split_width + card_gap), "y": section_y},
+        "col": 0, "row": 0,
+        "data": {
+            "baselineMode": "text",
+            "title": {"text": "Best Performing Model", "bold": True, "color": "#166534"},
+            "type": "scorecard", "background": "#F0FDF4",
+            "keyValue": "Data!Z6", "baseline": "Data!Z7",
+            "humanize": False, "chartId": VALIDATION_BEST_SCORECARD_ID,
+        },
+    })
+
+    chart_y = section_y + card_height + 18
+    validation_chart_data = {
+        "title": {"text": "Overall Sales Forecast (Trained & Tested)", "bold": True, "color": "#007A83", "fontSize": 24},
+        "metaData": {
+            "groupBy": ["date:month", "series"],
+            "measure": "revenue", "order": None,
+            "resModel": "sale.forecast.validation.point",
+            "mode": "line", "cumulatedStart": False,
+        },
+        "searchParams": {
+            "comparison": None, "context": {"group_by": []},
+            "domain": [
+                ["company_id", "=", int(forecast_context.get("company_id") or 0)],
+                ["owner_id", "=", int(forecast_context.get("owner_id") or 0)],
+                ["series", "in", ["actual", "arima_predicted", "exponential_smoothing_predicted"]],
+            ],
+            "groupBy": ["date:month", "series"], "orderBy": [],
+        },
+        "type": "odoo_line", "dataSets": [{}],
+        "verticalAxisPosition": "left", "stacked": False, "cumulatedStart": False,
+        "axesDesign": {"y": {"title": {"text": "Revenue"}}},
+        "fillArea": False, "chartId": VALIDATION_CHART_ID,
+        "fieldMatching": {FORECAST_FILTER_ID: {"chain": "forecast_period", "type": "selection"}},
+    }
+    figures.append({
+        "id": VALIDATION_CHART_ID, "width": chart_width, "height": 300, "tag": "chart",
+        "offset": {"x": 0, "y": chart_y}, "col": 0, "row": 0,
+        "data": validation_chart_data,
+    })
+
+
+
+def _forecast_ml_chart_domain(forecast_context):
+    """Scope the ML/regression chart to the forecast-point table.
+
+    This chart combines the time-series outputs (Exponential Smoothing and
+    ARIMA) with Linear and Polynomial Regression. The global Forecast Period
+    filter is applied through fieldMatching on forecast_period.
+    """
+    company_id = int(forecast_context.get("company_id") or 0)
+    owner_id = int(forecast_context.get("owner_id") or 0)
+    return [
+        ["company_id", "=", company_id],
+        ["owner_id", "=", owner_id],
+        # Show both time-series algorithms and regression lines in this
+        # chart. The native AOV chart excludes linear/polynomial series below.
+        ["series", "in", [
+            "exponential_smoothing_forecast",
+            "arima_forecast",
+            "linear_forecast",
+            "polynomial_forecast",
+        ]],
+    ]
+
+
+def _forecast_chart_domain(forecast_context):
+    """Return the AOV chart scope, excluding regression and ML series.
+
+    Linear and Polynomial Regression are now displayed in the ML Algorithms
+    chart alongside Exponential Smoothing and ARIMA. This chart keeps only
+    actual revenue and the original forecast revenue series.
+    """
+    company_id = int(forecast_context.get("company_id") or 0)
+    owner_id = int(forecast_context.get("owner_id") or 0)
+    return [
+        ["company_id", "=", company_id],
+        ["owner_id", "=", owner_id],
+        ["series", "in", [
+            "actual",
+            "forecast",
+        ]],
+    ]
 
 
 def _register_menu_references(data):

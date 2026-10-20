@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Spreadsheet Dashboard for Sale Enhancements with AI",
+    'summary': "Enhances Sales dashboard KPIs with regression, Exponential Smoothing, and ARIMA sales forecasts.",
     'summary': "Adds Revenue per Customer, Sales Growth, Order Cancellation % "
                "and Product Sale Contribution % to the existing Sales Dashboard.",
     'description': """
@@ -18,14 +19,23 @@ left completely untouched.
 See the module README for full details of the formulas used and the data
 sources they reuse.
 """,
-    'version': '19.0.1.2.0',
+    'version': '19.0.5.3.3',
     'category': 'Productivity/Dashboard',
     'author': 'Abat Mathew Rajesh',
     'license': 'LGPL-3',
     'depends': [
         'spreadsheet_dashboard_sale',
     ],
-    'data': [],
+    'data': [
+        'security/ir.model.access.csv',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'spreadsheet_dashboard_sale_enhancements_withAI/static/src/js/forecast_aov_tooltip.js',
+            'spreadsheet_dashboard_sale_enhancements_withAI/static/src/js/forecast_axis_filter.js',
+            'spreadsheet_dashboard_sale_enhancements_withAI/static/src/css/forecast_aov_tooltip.css',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,

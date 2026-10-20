@@ -247,3 +247,90 @@ following could **not** be runtime-verified and are worth checking first:
 ## v1.2 Product Sale % correction
 
 Product Sale % is calculated as each positive product revenue divided by the total positive `sale.report.price_subtotal` for the same dashboard/global-filter domain. Negative discount rows are excluded from the denominator and display 0% in the contribution column. This prevents discount lines from making a normal product exceed 100%, while the denominator includes all positive products rather than only the visible top-10 rows.
+
+## Overall Sales Forecast
+
+This version includes the **Overall Sales Forecast** panel above Monthly Sales.
+
+### Forecast Period filter
+
+The dashboard adds an independent **Forecast Period** selection filter with:
+
+- 7 Days
+- 1 Month (default)
+- 6 Months
+- 1 Year
+- 2 Years
+- 5 Years
+- 10 Years
+
+The filter is matched to the forecast chart and forecast summary only; the
+standard Sales dashboard date/customer/product/salesperson filters are not
+mutated by this feature.
+
+### Forecast calculation
+
+The Overall Sales Forecast preserves the original cumulative daily run-rate forecast and adds linear and degree-2 polynomial regression comparison forecasts using confirmed `sale.order` revenue aggregated to daily totals.
+
+The separate **Overall Sales Forecast (ML Algorithm)** chart now contains **two time-series models side by side**:
+
+- **Exponential Smoothing:** Holt exponential smoothing with an additive, damped trend and estimated initial state. Monthly horizons are fitted to one confirmed-revenue value per completed calendar month. The current month is excluded from training and is then shown as the first future forecast point.
+- **ARIMA:** ARIMA with a preferred `(1, 1, 1)` order. If that order does not converge for the available history, nearby valid `(0, 1, 1)`, `(1, 1, 0)`, and `(0, 1, 0)` models are tried and the lowest-AIC converged model is selected. This keeps the dashboard operational for short or strongly trending histories.
+
+For monthly horizons, both ML models use completed monthly revenue. For the **7 Days** horizon, both models use continuous daily history and return seven daily forecasts. The current month is the first plotted future point for the monthly ML chart so its endpoint remains aligned with the existing forecast chart; therefore the 1 Month filter displays the current month plus one selected future month, 6 Months displays the current month plus six selected future months, and so on.
+
+The ML chart contains only the **Exponential Smoothing** and **ARIMA** series. The Forecast Period filter controls both series together. The original Forecast Revenue KPI and the native Overall Sales Forecast calculations remain unchanged.
+
+The scientific dependencies used by the forecast engine are listed in `requirements.txt`: NumPy, SciPy, scikit-learn, and statsmodels 0.14.6. Negative or non-finite ML predictions are clipped to zero before they are written to the dashboard.
+
+A developer diagnostic helper is available from an Odoo shell:
+
+```python
+env["sale.forecast.point"].get_forecast_debug("1_month")
+env["sale.forecast.point"].get_forecast_debug("6_months")
+```
+
+The Odoo module itself does not declare scientific packages through Odoo's
+external dependency manifest. Install the packages from `requirements.txt` in
+the same Python environment used by the Odoo server before upgrading the module.
+
+### Forecast chart default / filter behavior
+
+The Overall Sales Forecast now opens in a historical/back-test view. The chart shows actual revenue for completed months together with a historical forecast for those months. Each historical forecast uses only revenue from dates before the month being forecast, so the target month's actual revenue is not used in its own forecast.
+
+The future forecast horizons (7 Days, 1 Month, 6 Months, 1 Year, 2 Years, 5 Years, and 10 Years) are not displayed in the default Historical view. Selecting a Forecast Period switches the chart to that future horizon, while retaining the historical actual series.
+
+## Model training and testing
+
+The dashboard also performs a chronological 80/20 hold-out validation on the
+continuous daily confirmed-sales history. The first 80% is used for training
+and the final 20% is held out as unseen test data. Both the existing ARIMA
+and Exponential Smoothing implementations are evaluated on the same test
+window. The dashboard shows Actual Sales plus both model predictions in a
+compact Training & Testing chart and reports MAE, RMSE, and MAPE. MAPE ignores
+zero-actual days because percentage error is undefined there; MAE and RMSE
+include all test days. The best model is ranked by MAPE, with RMSE as the tie
+breaker.
+
+The validation dataset is stored in `sale.forecast.validation.point` and is
+refreshed together with the existing forecast points. It does not change the
+Forecast Period selector or the existing forecast calculations.
+
+## Chart "Group by" selector follows the Forecast Period filter (v19.0.5.3.3)
+
+The small selector next to each forecast chart is filtered by the header
+**Forecast Period** filter (implemented in `static/src/js/forecast_axis_filter.js`
+by patching `OdooChartFeaturePlugin.getAvailableChartGranularities`):
+
+| Forecast Period            | Selector options          |
+|----------------------------|---------------------------|
+| 7 Days                     | Days, Months              |
+| 1 Month, 6 Months          | Months, Quarters          |
+| 1 / 2 / 5 / 10 Years       | Months, Quarters, Years   |
+| nothing selected           | all options               |
+
+After updating the files run `odoo-bin -u spreadsheet_dashboard_sale_enhancements_withAI`
+and open the dashboard with `?debug=assets` once so the JS bundle is rebuilt.
+
+v19.0.5.3.3 fix: removed `import { Chart } from "chart.js"` (not an Odoo ES module, it made the whole file fail to load) and added support for the newer `definition.dataSource.metaData` chart shape. The selector now applies to every chart.
+Also moved the Forecast Period chart-regrouping hook from GlobalFiltersCoreViewPlugin.handle (not called in newer Odoo) to OdooChartFeaturePlugin, which works on both.

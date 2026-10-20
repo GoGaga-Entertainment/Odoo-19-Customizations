@@ -19,6 +19,9 @@ Features included:
 - Top 10 Countries view for country-wise event sales analysis.
 - Dashboard filters for date, venue, event template, tags, and organizer.
 - Revenue and KPI display enhancements for improved dashboard readability.
+- AI forecast section: Forecast Period filter, event sales forecast, ML algorithms
+  (ARIMA, Exponential Smoothing, Linear and Polynomial Regression) and
+  Training/Testing back-test with Best Performing Model.
 
 All enhancements are implemented through the custom module and the
 existing Odoo Events spreadsheet dashboard.
@@ -34,6 +37,14 @@ existing Odoo Events spreadsheet dashboard.
         "security/ir.model.access.csv",
         "views/event_sale_report_views.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "spreadsheet_dashboard_event_sale_enhancements_withAI/static/src/js/event_forecast_axis_filter.js",
+        ],
+    },
+    "external_dependencies": {
+        "python": ["numpy", "scipy", "sklearn", "statsmodels"],
+    },
     "installable": True,
     "post_init_hook": "post_init_hook",
     "uninstall_hook": "uninstall_hook",

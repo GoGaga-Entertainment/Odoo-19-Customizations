@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Expose the custom event.sale.report country field in the standard
+        Events Sales report search view.
+
+        This follows the native Sales dashboard pattern: Top Countries is
+        powered by a Spreadsheet ODOO pivot, while the chart itself keeps
+        using the normal event_sale.event_sale_report_action.
+
+        No duplicate ir.actions.act_window is created here.
+        No duplicate list view is created here.
+    -->
+    <record id="event_sale_report_view_search_country"
+            model="ir.ui.view">
+        <field name="name">event.sale.report.view.search.country</field>
+        <field name="model">event.sale.report</field>
+        <field name="inherit_id"
+               ref="event_sale.event_sale_report_view_search"/>
+
+        <field name="arch" type="xml">
+
+            <field name="event_id" position="after">
+                <field name="country_id"/>
+            </field>
+
+            <filter name="group_by_event_id" position="after">
+                <filter
+                    string="Country"
+                    name="group_by_country_id"
+                    context="{'group_by': 'country_id'}"/>
+            </filter>
+
+        </field>
+    </record>
+
+</odoo>

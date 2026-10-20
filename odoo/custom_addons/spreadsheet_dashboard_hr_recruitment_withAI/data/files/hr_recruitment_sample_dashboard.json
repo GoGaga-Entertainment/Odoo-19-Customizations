@@ -1,0 +1,1191 @@
+{
+  "version": "18.5.10",
+  "sheets": [
+    {
+      "id": "8f8f21a6-7d30-4a17-bd21-hrrecruitment",
+      "name": "Dashboard",
+      "colNumber": 10,
+      "rowNumber": 120,
+      "rows": {
+        "0": {
+          "size": 40
+        },
+        "10": {
+          "size": 40
+        },
+        "11": {
+          "size": 34
+        },
+        "12": {
+          "size": 27
+        },
+        "13": {
+          "size": 27
+        },
+        "14": {
+          "size": 27
+        },
+        "15": {
+          "size": 27
+        },
+        "16": {
+          "size": 27
+        },
+        "17": {
+          "size": 27
+        },
+        "18": {
+          "size": 27
+        },
+        "19": {
+          "size": 27
+        },
+        "20": {
+          "size": 27
+        },
+        "21": {
+          "size": 27
+        },
+        "39": {
+          "size": 40
+        },
+        "49": {
+          "size": 40
+        },
+        "50": {
+          "size": 34
+        },
+        "51": {
+          "size": 27
+        },
+        "52": {
+          "size": 27
+        },
+        "53": {
+          "size": 27
+        },
+        "54": {
+          "size": 27
+        },
+        "55": {
+          "size": 27
+        },
+        "56": {
+          "size": 27
+        },
+        "57": {
+          "size": 27
+        },
+        "58": {
+          "size": 27
+        },
+        "59": {
+          "size": 27
+        },
+        "60": {
+          "size": 27
+        }
+      },
+      "cols": {
+        "0": {
+          "size": 280
+        },
+        "1": {
+          "size": 105
+        },
+        "2": {
+          "size": 100
+        },
+        "3": {
+          "size": 6
+        },
+        "4": {
+          "size": 14
+        },
+        "5": {
+          "size": 280
+        },
+        "6": {
+          "size": 105
+        },
+        "7": {
+          "size": 100
+        },
+        "8": {
+          "size": 6
+        },
+        "9": {
+          "size": 14
+        }
+      },
+      "merges": [],
+      "cells": {
+        "A1": "Employees",
+        "F11": "Job Applicants by University",
+        "F12": "=PIVOT(7, 10, FALSE, FALSE)",
+        "H12": "% of Total",
+        "H13": "=IFERROR(IF(G13,G13/Data!$B$1,\"\"),\"\")",
+        "H14": "=IFERROR(IF(G14,G14/Data!$B$1,\"\"),\"\")",
+        "H15": "=IFERROR(IF(G15,G15/Data!$B$1,\"\"),\"\")",
+        "H16": "=IFERROR(IF(G16,G16/Data!$B$1,\"\"),\"\")",
+        "H17": "=IFERROR(IF(G17,G17/Data!$B$1,\"\"),\"\")",
+        "H18": "=IFERROR(IF(G18,G18/Data!$B$1,\"\"),\"\")",
+        "H19": "=IFERROR(IF(G19,G19/Data!$B$1,\"\"),\"\")",
+        "H20": "=IFERROR(IF(G20,G20/Data!$B$1,\"\"),\"\")",
+        "H21": "=IFERROR(IF(G21,G21/Data!$B$1,\"\"),\"\")",
+        "H22": "=IFERROR(IF(G22,G22/Data!$B$1,\"\"),\"\")",
+        "A40": "Interns",
+        "F50": "Internship Applicants by University",
+        "F51": "=PIVOT(8, 10, FALSE, FALSE)",
+        "H51": "% of Total",
+        "H52": "=IFERROR(IF(G52,G52/Data!$B$2,\"\"),\"\")",
+        "H53": "=IFERROR(IF(G53,G53/Data!$B$2,\"\"),\"\")",
+        "H54": "=IFERROR(IF(G54,G54/Data!$B$2,\"\"),\"\")",
+        "H55": "=IFERROR(IF(G55,G55/Data!$B$2,\"\"),\"\")",
+        "H56": "=IFERROR(IF(G56,G56/Data!$B$2,\"\"),\"\")",
+        "H57": "=IFERROR(IF(G57,G57/Data!$B$2,\"\"),\"\")",
+        "H58": "=IFERROR(IF(G58,G58/Data!$B$2,\"\"),\"\")",
+        "H59": "=IFERROR(IF(G59,G59/Data!$B$2,\"\"),\"\")",
+        "H60": "=IFERROR(IF(G60,G60/Data!$B$2,\"\"),\"\")",
+        "H61": "=IFERROR(IF(G61,G61/Data!$B$2,\"\"),\"\")"
+      },
+      "styles": {
+        "A1": 8,
+        "A40": 8,
+        "F11": 1,
+        "F12": 2,
+        "F13:H22": 4,
+        "G12": 7,
+        "H12": 7,
+        "H13:H22": 6,
+        "F50": 1,
+        "F51": 2,
+        "F52:H61": 4,
+        "G51": 7,
+        "H51": 7,
+        "H52:H61": 6
+      },
+      "formats": {
+        "H13:H22": 3,
+        "H52:H61": 3
+      },
+      "borders": {
+        "F11:H11": 1,
+        "F12:H12": 1,
+        "F50:H50": 1,
+        "F51:H51": 1
+      },
+      "figures": [
+        {
+          "id": "kpi-all-job-applicants",
+          "width": 305,
+          "height": 110,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "All-time Job Applicants",
+              "color": "#434343",
+              "bold": true
+            },
+            "type": "scorecard",
+            "background": "#EFF6FF",
+            "keyValue": "Data!B1",
+            "humanize": false,
+            "chartId": "kpi-all-job-applicants"
+          },
+          "offset": {
+            "x": 0,
+            "y": 50
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "kpi-active-job-vacancies",
+          "width": 305,
+          "height": 110,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Active Job Vacancies",
+              "color": "#434343",
+              "bold": true
+            },
+            "type": "scorecard",
+            "background": "#FEF2F2",
+            "keyValue": "Data!B5",
+            "humanize": false,
+            "chartId": "kpi-active-job-vacancies"
+          },
+          "offset": {
+            "x": 330,
+            "y": 50
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "kpi-active-job-applicants",
+          "width": 305,
+          "height": 110,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Active Job Applicants",
+              "color": "#434343",
+              "bold": true
+            },
+            "type": "scorecard",
+            "background": "#ECFDF5",
+            "keyValue": "Data!B3",
+            "humanize": false,
+            "chartId": "kpi-active-job-applicants"
+          },
+          "offset": {
+            "x": 660,
+            "y": 50
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "chart-job-applicants-role",
+          "width": 485,
+          "height": 320,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Job Applicants by Role",
+              "fontSize": 20,
+              "bold": true,
+              "color": "#01666B"
+            },
+            "background": "#FFFFFF",
+            "legendPosition": "top",
+            "metaData": {
+              "groupBy": [
+                "job_id"
+              ],
+              "measure": "__count",
+              "order": null,
+              "resModel": "hr.applicant",
+              "mode": "bar",
+              "cumulatedStart": false
+            },
+            "searchParams": {
+              "comparison": null,
+              "context": {
+                "group_by": [
+                  "job_id"
+                ],
+                "active_test": false
+              },
+              "domain": [
+                [
+                  "job_id",
+                  "!=",
+                  false
+                ]
+              ],
+              "groupBy": [
+                "job_id"
+              ],
+              "orderBy": []
+            },
+            "type": "odoo_bar",
+            "dataSets": [
+              {}
+            ],
+            "verticalAxisPosition": "left",
+            "stacked": false,
+            "cumulatedStart": false,
+            "chartId": "chart-job-applicants-role",
+            "fieldMatching": {
+              "81e4f937-f95b-4e38-a1f4-jobrolefilter": {
+                "chain": "job_id",
+                "type": "many2one"
+              },
+              "f47b8ec2-51f1-463d-a427-jobuniversity": {
+                "chain": "dashboard_university_id",
+                "type": "many2one"
+              }
+            }
+          },
+          "offset": {
+            "x": 0,
+            "y": 245
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "chart-job-applications-month",
+          "width": 990,
+          "height": 320,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Job Applications by Month",
+              "fontSize": 20,
+              "bold": true,
+              "color": "#01666B"
+            },
+            "background": "#FFFFFF",
+            "legendPosition": "none",
+            "metaData": {
+              "groupBy": [
+                "create_date:month"
+              ],
+              "measure": "__count",
+              "order": null,
+              "resModel": "hr.applicant",
+              "mode": "line",
+              "cumulatedStart": false
+            },
+            "searchParams": {
+              "comparison": null,
+              "context": {
+                "group_by": [
+                  "create_date"
+                ],
+                "active_test": false
+              },
+              "domain": [],
+              "groupBy": [
+                "create_date"
+              ],
+              "orderBy": []
+            },
+            "type": "odoo_line",
+            "dataSets": [
+              {}
+            ],
+            "verticalAxisPosition": "left",
+            "stacked": false,
+            "cumulatedStart": false,
+            "chartId": "chart-job-applications-month",
+            "fieldMatching": {
+              "81e4f937-f95b-4e38-a1f4-jobrolefilter": {
+                "chain": "job_id",
+                "type": "many2one"
+              },
+              "f47b8ec2-51f1-463d-a427-jobuniversity": {
+                "chain": "dashboard_university_id",
+                "type": "many2one"
+              }
+            },
+            "fillArea": true
+          },
+          "offset": {
+            "x": 0,
+            "y": 660
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "kpi-all-intern-applicants",
+          "width": 305,
+          "height": 110,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "All-time Internship Applicants",
+              "color": "#434343",
+              "bold": true
+            },
+            "type": "scorecard",
+            "background": "#F5F3FF",
+            "keyValue": "Data!B2",
+            "humanize": false,
+            "chartId": "kpi-all-intern-applicants"
+          },
+          "offset": {
+            "x": 0,
+            "y": 1100
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "kpi-active-internship-roles",
+          "width": 305,
+          "height": 110,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Active Internship Roles",
+              "color": "#434343",
+              "bold": true
+            },
+            "type": "scorecard",
+            "background": "#F0F9FF",
+            "keyValue": "Data!B6",
+            "humanize": false,
+            "chartId": "kpi-active-internship-roles"
+          },
+          "offset": {
+            "x": 330,
+            "y": 1100
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "kpi-active-intern-applicants",
+          "width": 305,
+          "height": 110,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Active Internship Applicants",
+              "color": "#434343",
+              "bold": true
+            },
+            "type": "scorecard",
+            "background": "#FFF7ED",
+            "keyValue": "Data!B4",
+            "humanize": false,
+            "chartId": "kpi-active-intern-applicants"
+          },
+          "offset": {
+            "x": 660,
+            "y": 1100
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "chart-intern-applicants-role",
+          "width": 485,
+          "height": 320,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Internship Applicants by Role",
+              "fontSize": 20,
+              "bold": true,
+              "color": "#01666B"
+            },
+            "background": "#FFFFFF",
+            "legendPosition": "top",
+            "metaData": {
+              "groupBy": [
+                "job_id"
+              ],
+              "measure": "__count",
+              "order": null,
+              "resModel": "intern.applicant",
+              "mode": "bar",
+              "cumulatedStart": false
+            },
+            "searchParams": {
+              "comparison": null,
+              "context": {
+                "group_by": [
+                  "job_id"
+                ],
+                "active_test": false
+              },
+              "domain": [
+                [
+                  "job_id",
+                  "!=",
+                  false
+                ]
+              ],
+              "groupBy": [
+                "job_id"
+              ],
+              "orderBy": []
+            },
+            "type": "odoo_bar",
+            "dataSets": [
+              {}
+            ],
+            "verticalAxisPosition": "left",
+            "stacked": false,
+            "cumulatedStart": false,
+            "chartId": "chart-intern-applicants-role",
+            "fieldMatching": {
+              "0ef46e58-19d0-4fc0-a344-internshiprole": {
+                "chain": "job_id",
+                "type": "many2one"
+              },
+              "d7b8c5e3-706c-4dcc-99df-universityfilter": {
+                "chain": "university_id",
+                "type": "many2one"
+              }
+            }
+          },
+          "offset": {
+            "x": 0,
+            "y": 1225
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "chart-intern-applications-month",
+          "width": 990,
+          "height": 320,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Internship Applications by Month",
+              "fontSize": 20,
+              "bold": true,
+              "color": "#01666B"
+            },
+            "background": "#FFFFFF",
+            "legendPosition": "none",
+            "metaData": {
+              "groupBy": [
+                "create_date:month"
+              ],
+              "measure": "__count",
+              "order": null,
+              "resModel": "intern.applicant",
+              "mode": "line",
+              "cumulatedStart": false
+            },
+            "searchParams": {
+              "comparison": null,
+              "context": {
+                "group_by": [
+                  "create_date"
+                ],
+                "active_test": false
+              },
+              "domain": [],
+              "groupBy": [
+                "create_date"
+              ],
+              "orderBy": []
+            },
+            "type": "odoo_line",
+            "dataSets": [
+              {}
+            ],
+            "verticalAxisPosition": "left",
+            "stacked": false,
+            "cumulatedStart": false,
+            "chartId": "chart-intern-applications-month",
+            "fieldMatching": {
+              "0ef46e58-19d0-4fc0-a344-internshiprole": {
+                "chain": "job_id",
+                "type": "many2one"
+              },
+              "d7b8c5e3-706c-4dcc-99df-universityfilter": {
+                "chain": "university_id",
+                "type": "many2one"
+              }
+            },
+            "fillArea": true
+          },
+          "offset": {
+            "x": 0,
+            "y": 1640
+          },
+          "col": 0,
+          "row": 0
+        },
+        {
+          "id": "chart-interns-stage",
+          "width": 990,
+          "height": 320,
+          "tag": "chart",
+          "data": {
+            "title": {
+              "text": "Interns By Stages",
+              "fontSize": 20,
+              "bold": true,
+              "color": "#01666B"
+            },
+            "background": "#FFFFFF",
+            "legendPosition": "top",
+            "metaData": {
+              "groupBy": [
+                "stage_id"
+              ],
+              "measure": "__count",
+              "order": null,
+              "resModel": "intern.applicant",
+              "mode": "bar",
+              "cumulatedStart": false
+            },
+            "searchParams": {
+              "comparison": null,
+              "context": {
+                "group_by": [
+                  "stage_id"
+                ],
+                "active_test": false
+              },
+              "domain": [
+                [
+                  "stage_id.intern_workflow_category",
+                  "in",
+                  [
+                    "selection",
+                    "onboarding",
+                    "active",
+                    "completed"
+                  ]
+                ]
+              ],
+              "groupBy": [
+                "stage_id"
+              ],
+              "orderBy": []
+            },
+            "type": "odoo_bar",
+            "dataSets": [
+              {}
+            ],
+            "verticalAxisPosition": "left",
+            "stacked": false,
+            "cumulatedStart": false,
+            "chartId": "chart-interns-stage",
+            "fieldMatching": {
+              "0ef46e58-19d0-4fc0-a344-internshiprole": {
+                "chain": "job_id",
+                "type": "many2one"
+              },
+              "d7b8c5e3-706c-4dcc-99df-universityfilter": {
+                "chain": "university_id",
+                "type": "many2one"
+              }
+            }
+          },
+          "offset": {
+            "x": 0,
+            "y": 2055
+          },
+          "col": 0,
+          "row": 0
+        }
+      ],
+      "tables": [],
+      "areGridLinesVisible": false,
+      "isVisible": true
+    },
+    {
+      "id": "c191ef5e-d848-4987-a511-hrrecruitmentdata",
+      "name": "Data",
+      "colNumber": 5,
+      "rowNumber": 20,
+      "rows": {},
+      "cols": {
+        "0": {
+          "size": 260
+        },
+        "1": {
+          "size": 120
+        }
+      },
+      "merges": [],
+      "cells": {
+        "A1": "All-time Job Applicants",
+        "B1": "=PIVOT.VALUE(1,\"__count\")",
+        "A2": "All-time Internship Applicants",
+        "B2": "=PIVOT.VALUE(2,\"__count\")",
+        "A3": "Active Job Applicants",
+        "B3": "=PIVOT.VALUE(3,\"__count\")",
+        "A4": "Active Internship Applicants",
+        "B4": "=PIVOT.VALUE(4,\"__count\")",
+        "A5": "Active Job Vacancies",
+        "B5": "=PIVOT.VALUE(5,\"__count\")",
+        "A6": "Active Internship Roles",
+        "B6": "=PIVOT.VALUE(6,\"__count\")"
+      },
+      "styles": {
+        "A1:A6": 2,
+        "B1:B6": 5
+      },
+      "formats": {},
+      "borders": {},
+      "figures": [],
+      "tables": [],
+      "areGridLinesVisible": true,
+      "isVisible": true
+    }
+  ],
+  "styles": {
+    "1": {
+      "textColor": "#01666B",
+      "bold": true,
+      "fontSize": 16
+    },
+    "2": {
+      "textColor": "#434343",
+      "bold": true,
+      "fontSize": 11,
+      "fillColor": "#F8F9FA",
+      "verticalAlign": "middle"
+    },
+    "3": {
+      "textColor": "#01666B",
+      "verticalAlign": "middle"
+    },
+    "4": {
+      "textColor": "#434343",
+      "verticalAlign": "middle"
+    },
+    "5": {
+      "textColor": "#434343",
+      "bold": true,
+      "fontSize": 12,
+      "align": "right"
+    },
+    "6": {
+      "textColor": "#434343",
+      "verticalAlign": "middle",
+      "align": "right"
+    },
+    "7": {
+      "textColor": "#434343",
+      "bold": true,
+      "fontSize": 11,
+      "verticalAlign": "middle",
+      "align": "center"
+    },
+    "8": {
+      "textColor": "#01666B",
+      "bold": true,
+      "fontSize": 22,
+      "verticalAlign": "middle"
+    }
+  },
+  "formats": {
+    "1": "#,##0",
+    "2": "mm/dd/yyyy hh:mm",
+    "3": "0.0%"
+  },
+  "borders": {
+    "1": {
+      "bottom": {
+        "style": "thin",
+        "color": "#CCCCCC"
+      }
+    }
+  },
+  "revisionId": "START_REVISION",
+  "settings": {
+    "locale": {
+      "name": "English (US)",
+      "code": "en_US",
+      "thousandsSeparator": ",",
+      "decimalSeparator": ".",
+      "dateFormat": "mm/dd/yyyy",
+      "timeFormat": "hh:mm:ss",
+      "formulaArgSeparator": ",",
+      "weekStart": 7
+    }
+  },
+  "pivots": {
+    "1": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "81e4f937-f95b-4e38-a1f4-jobrolefilter": {
+          "chain": "job_id",
+          "type": "many2one"
+        },
+        "f47b8ec2-51f1-463d-a427-jobuniversity": {
+          "chain": "dashboard_university_id",
+          "type": "many2one"
+        },
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": [],
+        "active_test": false
+      },
+      "domain": [],
+      "id": "1",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum"
+        }
+      ],
+      "model": "hr.applicant",
+      "name": "KPI - All-time Job Applicants",
+      "sortedColumn": null,
+      "formulaId": "1",
+      "columns": [],
+      "rows": []
+    },
+    "2": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "0ef46e58-19d0-4fc0-a344-internshiprole": {
+          "chain": "job_id",
+          "type": "many2one"
+        },
+        "d7b8c5e3-706c-4dcc-99df-universityfilter": {
+          "chain": "university_id",
+          "type": "many2one"
+        },
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": [],
+        "active_test": false
+      },
+      "domain": [],
+      "id": "2",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum"
+        }
+      ],
+      "model": "intern.applicant",
+      "name": "KPI - All-time Internship Applicants",
+      "sortedColumn": null,
+      "formulaId": "2",
+      "columns": [],
+      "rows": []
+    },
+    "3": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "81e4f937-f95b-4e38-a1f4-jobrolefilter": {
+          "chain": "job_id",
+          "type": "many2one"
+        },
+        "f47b8ec2-51f1-463d-a427-jobuniversity": {
+          "chain": "dashboard_university_id",
+          "type": "many2one"
+        },
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": []
+      },
+      "domain": [
+        [
+          "active",
+          "=",
+          true
+        ],
+        [
+          "date_closed",
+          "=",
+          false
+        ]
+      ],
+      "id": "3",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum"
+        }
+      ],
+      "model": "hr.applicant",
+      "name": "KPI - Active Job Applicants",
+      "sortedColumn": null,
+      "formulaId": "3",
+      "columns": [],
+      "rows": []
+    },
+    "4": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "0ef46e58-19d0-4fc0-a344-internshiprole": {
+          "chain": "job_id",
+          "type": "many2one"
+        },
+        "d7b8c5e3-706c-4dcc-99df-universityfilter": {
+          "chain": "university_id",
+          "type": "many2one"
+        },
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": []
+      },
+      "domain": [
+        [
+          "active",
+          "=",
+          true
+        ],
+        [
+          "application_status",
+          "=",
+          "ongoing"
+        ]
+      ],
+      "id": "4",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum"
+        }
+      ],
+      "model": "intern.applicant",
+      "name": "KPI - Active Internship Applicants",
+      "sortedColumn": null,
+      "formulaId": "4",
+      "columns": [],
+      "rows": []
+    },
+    "5": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": []
+      },
+      "domain": [
+        [
+          "active",
+          "=",
+          true
+        ]
+      ],
+      "id": "5",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum"
+        }
+      ],
+      "model": "hr.job",
+      "name": "KPI - Standard Job Vacancies",
+      "sortedColumn": null,
+      "formulaId": "5",
+      "columns": [],
+      "rows": []
+    },
+    "6": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": []
+      },
+      "domain": [
+        [
+          "active",
+          "=",
+          true
+        ]
+      ],
+      "id": "6",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum"
+        }
+      ],
+      "model": "intern.job",
+      "name": "KPI - Internship Vacancies",
+      "sortedColumn": null,
+      "formulaId": "6",
+      "columns": [],
+      "rows": []
+    },
+    "7": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "81e4f937-f95b-4e38-a1f4-jobrolefilter": {
+          "chain": "job_id",
+          "type": "many2one"
+        },
+        "f47b8ec2-51f1-463d-a427-jobuniversity": {
+          "chain": "dashboard_university_id",
+          "type": "many2one"
+        },
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": [],
+        "active_test": false
+      },
+      "domain": [
+        [
+          "dashboard_university_id",
+          "!=",
+          false
+        ]
+      ],
+      "id": "7",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum",
+          "userDefinedName": "Applicants"
+        }
+      ],
+      "model": "hr.applicant",
+      "name": "University",
+      "sortedColumn": {
+        "measure": "__count",
+        "order": "desc",
+        "domain": []
+      },
+      "formulaId": "7",
+      "columns": [],
+      "rows": [
+        {
+          "fieldName": "dashboard_university_id"
+        }
+      ]
+    },
+    "8": {
+      "type": "ODOO",
+      "fieldMatching": {
+        "0ef46e58-19d0-4fc0-a344-internshiprole": {
+          "chain": "job_id",
+          "type": "many2one"
+        },
+        "d7b8c5e3-706c-4dcc-99df-universityfilter": {
+          "chain": "university_id",
+          "type": "many2one"
+        },
+        "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d": {
+          "chain": "create_date",
+          "type": "date",
+          "offset": 0
+        }
+      },
+      "context": {
+        "group_by": [],
+        "active_test": false
+      },
+      "domain": [
+        [
+          "university_id",
+          "!=",
+          false
+        ]
+      ],
+      "id": "8",
+      "measures": [
+        {
+          "id": "__count",
+          "fieldName": "__count",
+          "aggregator": "sum",
+          "userDefinedName": "Applicants"
+        }
+      ],
+      "model": "intern.applicant",
+      "name": "University",
+      "sortedColumn": {
+        "measure": "__count",
+        "order": "desc",
+        "domain": []
+      },
+      "formulaId": "8",
+      "columns": [],
+      "rows": [
+        {
+          "fieldName": "university_id"
+        }
+      ]
+    }
+  },
+  "pivotNextId": 9,
+  "lists": {},
+  "listNextId": 1,
+  "globalFilters": [
+    {
+      "id": "7d6c4f1e-5f8d-4f6b-9e5c-2f6a4f1b8c3d",
+      "type": "date",
+      "label": "Period",
+      "defaultValue": "last_90_days"
+    },
+    {
+      "id": "81e4f937-f95b-4e38-a1f4-jobrolefilter",
+      "type": "relation",
+      "label": "Job Role",
+      "modelName": "hr.job",
+      "domainOfAllowedValues": [
+        [
+          "active",
+          "=",
+          true
+        ]
+      ],
+      "defaultValueDisplayNames": []
+    },
+    {
+      "id": "f47b8ec2-51f1-463d-a427-jobuniversity",
+      "type": "relation",
+      "label": "Job University",
+      "modelName": "hr.employee.university",
+      "domainOfAllowedValues": [],
+      "defaultValueDisplayNames": []
+    },
+    {
+      "id": "0ef46e58-19d0-4fc0-a344-internshiprole",
+      "type": "relation",
+      "label": "Internship Role",
+      "modelName": "intern.job",
+      "domainOfAllowedValues": [
+        [
+          "active",
+          "=",
+          true
+        ]
+      ],
+      "defaultValueDisplayNames": []
+    },
+    {
+      "id": "d7b8c5e3-706c-4dcc-99df-universityfilter",
+      "type": "relation",
+      "label": "Internship University",
+      "modelName": "hr.employee.university",
+      "domainOfAllowedValues": [],
+      "defaultValueDisplayNames": []
+    }
+  ],
+  "uniqueFigureIds": true,
+  "chartOdooMenusReferences": {
+    "kpi-active-job-vacancies": "hr_recruitment.menu_hr_job_position",
+    "kpi-active-job-applicants": "hr_recruitment.menu_hr_job_position",
+    "kpi-active-internship-roles": "recruitment_stages_status_enhancement.menu_intern_job_positions_list",
+    "kpi-active-intern-applicants": "recruitment_stages_status_enhancement.menu_intern_job_positions_list"
+  },
+  "customTableStyles": {}
+}

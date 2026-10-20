@@ -8,6 +8,9 @@ from .sales_dashboard_patch import patch_sales_dashboard_json
 
 _logger = logging.getLogger(__name__)
 
+# xmlid of the stock "Sales" dashboard record, defined in
+# spreadsheet_dashboard_sale/data/dashboards.xml:
+#   <record id="spreadsheet_dashboard_sales" model="spreadsheet.dashboard">
 TARGET_DASHBOARD_XMLID = "spreadsheet_dashboard_sale.spreadsheet_dashboard_sales"
 
 

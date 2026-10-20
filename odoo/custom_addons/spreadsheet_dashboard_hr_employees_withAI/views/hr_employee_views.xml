@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_dashboard_degree" model="ir.ui.view">
+        <field name="name">hr.employee.form.dashboard.degree</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority">30</field>
+        <field name="active">False</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='certificate']" position="attributes">
+                <attribute name="string">Certificate Level</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_search_dashboard_degree" model="ir.ui.view">
+        <field name="name">hr.employee.search.dashboard.degree</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="after">
+                <field name="degree_id"/>
+                <field name="country_id"/>
+                <field name="certificate"/>
+                <field name="employee_type"/>
+            </xpath>
+            <xpath expr="//filter[@name='group_employee_type']" position="after">
+                <filter
+                    name="group_dashboard_degree"
+                    string="Degree"
+                    domain="[]"
+                    context="{'group_by': 'degree_id'}"/>
+                <filter
+                    name="group_dashboard_nationality"
+                    string="Nationality"
+                    domain="[]"
+                    context="{'group_by': 'country_id'}"/>
+                <filter
+                    name="group_dashboard_certificate"
+                    string="Certification Level"
+                    domain="[]"
+                    context="{'group_by': 'certificate'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_degree_list" model="ir.ui.view">
+        <field name="name">hr.employee.degree.list</field>
+        <field name="model">hr.employee.degree</field>
+        <field name="active">False</field>
+        <field name="arch" type="xml">
+            <list string="Degrees">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_employee_degree_form" model="ir.ui.view">
+        <field name="name">hr.employee.degree.form</field>
+        <field name="model">hr.employee.degree</field>
+        <field name="active">False</field>
+        <field name="arch" type="xml">
+            <form string="Degree">
+                <sheet>
+                    <field name="name"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_employee_degrees" model="ir.actions.act_window">
+        <field name="name">Degrees</field>
+        <field name="res_model">hr.employee.degree</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_employee_degrees"
+        name="Degrees"
+        parent="hr.menu_config_employee"
+        action="action_employee_degrees"
+        groups="hr.group_hr_manager"
+        active="False"
+        sequence="8"/>
+
+</odoo>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        TOP COUNTRIES - EVENT SALES REPORT SEARCH VIEW
+
+        The Top Countries dashboard uses event.sale.report and the
+        existing country_id field. Expose country_id in the standard
+        Events Sales report search view so the same field is available
+        to the report/list/pivot definitions.
+
+        No new backend action is created here.
+        No duplicate list view is created here.
+    -->
+    <record id="event_sale_report_view_search_country"
+            model="ir.ui.view">
+        <field name="name">event.sale.report.view.search.country</field>
+        <field name="model">event.sale.report</field>
+        <field name="inherit_id"
+               ref="event_sale.event_sale_report_view_search"/>
+
+        <field name="arch" type="xml">
+
+            <field name="event_id" position="after">
+                <field name="country_id"/>
+            </field>
+
+            <filter name="group_by_event_id" position="after">
+                <filter
+                    string="Country"
+                    name="group_by_country_id"
+                    context="{'group_by': 'country_id'}"/>
+            </filter>
+
+        </field>
+    </record>
+
+
+    <!--
+        TOP 10 ACTION SUPPORT
+
+        The Python dashboard keeps using the native Odoo Events action:
+
+            event_sale.event_sale_report_action
+
+        The action must expose list/form in addition to graph/pivot.
+        The existing Odoo event_sale module already provides the native
+        event.sale.report list view, so we do not create another list view.
+
+        The actual Top 10 dashboard data is supplied by the Spreadsheet
+        pivot created in the Python dashboard patch.
+    -->
+    <function model="ir.actions.act_window" name="write">
+        <value eval="[ref('event_sale.event_sale_report_action')]"/>
+        <value eval="{
+            'view_mode': 'graph,pivot,list,form',
+            'view_id': False,
+            'search_view_id': ref('event_sale_report_view_search_country')
+        }"/>
+    </function>
+
+</odoo>

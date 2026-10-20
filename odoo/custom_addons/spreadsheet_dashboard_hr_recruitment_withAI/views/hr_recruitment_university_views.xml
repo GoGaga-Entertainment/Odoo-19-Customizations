@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_recruitment_university_view_list" model="ir.ui.view">
+        <field name="name">hr.recruitment.university.list</field>
+        <field name="model">hr.recruitment.university</field>
+        <field name="arch" type="xml">
+            <list string="Universities">
+                <field name="name"/>
+                <field name="country_id" optional="show"/>
+                <field name="website" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_recruitment_university_view_form" model="ir.ui.view">
+        <field name="name">hr.recruitment.university.form</field>
+        <field name="model">hr.recruitment.university</field>
+        <field name="arch" type="xml">
+            <form string="University">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. SCMS School of Technology and Management"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="country_id"/>
+                            <field name="website" widget="url"/>
+                        </group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" placeholder="Optional notes about this institution..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_recruitment_university_view_search" model="ir.ui.view">
+    <field name="name">hr.recruitment.university.search</field>
+    <field name="model">hr.recruitment.university</field>
+    <field name="arch" type="xml">
+        <search>
+            <field name="name"/>
+            <field name="country_id"/>
+
+            <filter
+                name="archived"
+                string="Archived"
+                domain="[('active', '=', False)]"/>
+
+            <separator/>
+
+            <filter
+                name="group_by_country"
+                string="Country"
+                context="{'group_by': 'country_id'}"/>
+        </search>
+    </field>
+</record>
+
+    <record id="hr_recruitment_university_action" model="ir.actions.act_window">
+        <field name="name">Universities</field>
+        <field name="res_model">hr.recruitment.university</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="hr_recruitment_university_view_search"/>
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a university</p>
+            <p>Universities are used to classify and filter recruitment applicants.</p>
+        </field>
+    </record>
+
+    <menuitem
+        id="hr_recruitment_university_menu"
+        name="Universities"
+        parent="hr_recruitment.menu_hr_recruitment_configuration"
+        action="hr_recruitment_university_action"
+        groups="hr_recruitment.group_hr_recruitment_manager"
+        sequence="45"/>
+</odoo>
+

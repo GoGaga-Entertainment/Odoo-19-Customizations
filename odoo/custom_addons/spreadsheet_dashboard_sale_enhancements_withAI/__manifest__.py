@@ -2,6 +2,8 @@
 {
     'name': "Spreadsheet Dashboard for Sale Enhancements with AI",
     'summary': "Enhances Sales dashboard KPIs with regression, Exponential Smoothing, and ARIMA sales forecasts.",
+    'summary': "Adds Revenue per Customer, Sales Growth, Order Cancellation % "
+               "and Product Sale Contribution % to the existing Sales Dashboard.",
     'description': """
 Spreadsheet Dashboard for Sale Enhancements with AI
 ====================================================

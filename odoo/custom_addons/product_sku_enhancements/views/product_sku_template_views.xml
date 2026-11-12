@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View for SKU Product Codes -->
+    <record id="product_sku_template_view_tree" model="ir.ui.view">
+        <field name="name">product.sku.template.list</field>
+        <field name="model">product.sku.template</field>
+        <field name="arch" type="xml">
+            <list string="SKU Product Codes">
+                <field name="name" string="Product Name"/>
+                <field name="sku_infix" string="SKU Infix"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for SKU Product Codes -->
+    <record id="product_sku_template_view_form" model="ir.ui.view">
+        <field name="name">product.sku.template.form</field>
+        <field name="model">product.sku.template</field>
+        <field name="arch" type="xml">
+            <form string="SKU Product Code">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" string="Product Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Men's Cotton T-Shirt"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="prefix_suffix_settings" string="PRODUCT-SPECIFIC CODE STRUCTURE">
+                            <field name="sku_infix"
+                                   string="SKU Infix"
+                                   placeholder="e.g. URB-FUNNY-MEN-CTSH-PLAIN-"
+                                   help="The complete product-specific middle code."/>
+                        </group>
+                        <group name="template_options" string="Configuration">
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group name="notes" string="Description">
+                        <field name="description" nolabel="1" placeholder="Optional notes about this SKU infix or product line..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for SKU Product Codes -->
+    <record id="product_sku_template_view_search" model="ir.ui.view">
+        <field name="name">product.sku.template.search</field>
+        <field name="model">product.sku.template</field>
+        <field name="arch" type="xml">
+            <search string="Search SKU Product Codes">
+                <field name="name" string="Product Name"/>
+                <field name="sku_infix" string="SKU Infix"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action to manage SKU Product Codes -->
+    <record id="action_product_sku_template" model="ir.actions.act_window">
+        <field name="name">SKU Product Codes</field>
+        <field name="res_model">product.sku.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="product_sku_template_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first SKU Product Code!
+            </p>
+            <p>
+                Configure product-specific SKU infixes (e.g. <code>URB-FUNNY-MEN-CTSH-PLAIN-</code>).
+                When assigned to a product, SKUs will combine automatically:
+                <br/>
+                <em>[Global Prefix] + [SKU Infix] + [Variant Codes] + [Global Suffix]</em>
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item: Inventory -> Configuration -> Products -> SKU Product Codes -->
+    <menuitem id="menu_product_sku_template"
+              name="SKU Product Codes"
+              parent="stock.menu_product_in_config_stock"
+              action="action_product_sku_template"
+              sequence="60"/>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Inventory Settings with Fallback SKU Sequence Configuration -->
+    <record id="res_config_settings_view_form_sku" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sku</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="30"/>
+        <field name="inherit_id" ref="stock.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='stock']" position="inside">
+                <block title="Fallback SKU Sequence Configuration" name="sku_fallback_sequence_settings">
+                    <setting id="sku_sequence_setting" string="Fallback SKU Sequence" help="Sequence used only when normal product-specific SKU generation cannot be applied.">
+                        <field name="sku_sequence_id" options="{'no_create': True}"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

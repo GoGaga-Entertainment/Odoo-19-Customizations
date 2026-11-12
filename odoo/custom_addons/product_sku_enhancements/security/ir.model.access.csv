@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_sku_template_user,product.sku.template.user,model_product_sku_template,stock.group_stock_user,1,0,0,0
+access_product_sku_template_manager,product.sku.template.manager,model_product_sku_template,stock.group_stock_manager,1,1,1,1
+access_sku_clear_wizard_user,sku.clear.wizard.user,model_sku_clear_wizard,stock.group_stock_user,1,1,1,1
+access_sku_clear_wizard_manager,sku.clear.wizard.manager,model_sku_clear_wizard,stock.group_stock_manager,1,1,1,1

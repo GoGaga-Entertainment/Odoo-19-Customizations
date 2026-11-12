@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Display the QR Code at the lower-right of the Website Product Detail page.
+        - Replaces the terms_and_conditions element with a flex container that
+          keeps terms on the left and the QR code on the right.
+        - The QR code updates dynamically via product_qrcode.js when the
+          customer selects a different variant.
+        - Hidden (d-none) when no QR image is available for the selected variant.
+    -->
+    <template id="product_detail_qr_code"
+              inherit_id="website_sale.product"
+              name="Product Detail QR Code">
+        <xpath expr="//div[hasclass('o_wsale_product_details_content_section_cta')]//t[@t-call='website_sale.product_terms_and_conditions']"
+               position="replace">
+            <div class="d-flex justify-content-between align-items-end mt-2">
+                <!-- Preserve Terms &amp; Conditions on the left -->
+                <div class="flex-grow-1">
+                    <t t-if="is_view_active('website_sale.product_terms_and_conditions')"
+                       t-call="website_sale.product_terms_and_conditions"/>
+                </div>
+                <!-- QR Code on the right; hidden when no image available -->
+                <div id="product_qr_code"
+                     t-att-class="'text-end ms-3' + ('' if combination_info.get('qr_code_image') else ' d-none')">
+                    <img class="product_qr_code_img"
+                         t-att-src="combination_info.get('qr_code_image') and ('data:image/png;base64,' + combination_info['qr_code_image']) or ''"
+                         style="width: 100px; height: 100px; object-fit: contain;"
+                         alt="Product QR Code"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

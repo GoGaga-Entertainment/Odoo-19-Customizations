@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Requirement 1: QR Code Image positioned properly after Barcode in the form's
+                       content area, aligned with the field layout (not pushed to the far-right edge).
+        Requirement 2: QR Code Encoded Value (qr_code_value) declared invisible="1" so it is
+                       hidden from the form UI while preserved in the model and ORM.
+    -->
+
+    <!-- Product Variant full form view -->
+    <record id="product_normal_form_view_qrcode" model="ir.ui.view">
+        <field name="name">product.product.form.qrcode</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="qr_code_image" widget="image"
+                       options="{'size': [90, 90]}"
+                       readonly="1"
+                       class="oe_inline float-start me-auto"
+                       style="float: left !important; margin-left: 0 !important;"/>
+                <field name="qr_code_value" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Variant easy edit form view -->
+    <record id="product_variant_easy_edit_view_qrcode" model="ir.ui.view">
+        <field name="name">product.product.easy.edit.qrcode</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="qr_code_image" widget="image"
+                       options="{'size': [90, 90]}"
+                       readonly="1"
+                       class="oe_inline float-start me-auto"
+                       style="float: left !important; margin-left: 0 !important;"/>
+                <field name="qr_code_value" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Template form view: visible when single variant -->
+    <record id="product_template_only_form_view_qrcode" model="ir.ui.view">
+        <field name="name">product.template.form.qrcode</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="qr_code_image" widget="image"
+                       options="{'size': [90, 90]}"
+                       readonly="1"
+                       class="oe_inline float-start me-auto"
+                       style="float: left !important; margin-left: 0 !important;"
+                       invisible="product_variant_count &gt; 1 or not qr_code_image"/>
+                <field name="qr_code_value" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

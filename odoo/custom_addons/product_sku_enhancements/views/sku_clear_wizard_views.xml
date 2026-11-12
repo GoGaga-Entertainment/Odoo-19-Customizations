@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sku_clear_wizard_view_form" model="ir.ui.view">
+        <field name="name">sku.clear.wizard.form</field>
+        <field name="model">sku.clear.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirm Clearing SKUs">
+                <div class="alert alert-warning mb-3" role="alert">
+                    <h5 class="fw-bold mb-1">
+                        <i class="fa fa-exclamation-triangle me-1"/> Safe SKU Clearing Confirmation
+                    </h5>
+                    <p class="mb-0">
+                        This action will only reset the <strong>Internal Reference (SKU)</strong> field to empty.
+                        <br/>
+                        <strong>It will NOT delete:</strong> products, variants, barcodes, QR codes, or SKU templates.
+                    </p>
+                </div>
+
+                <group>
+                    <field name="product_tmpl_id" invisible="not product_tmpl_id"/>
+                    <field name="product_id" invisible="not product_id"/>
+                </group>
+
+                <group string="Affected Records">
+                    <field name="generated_sku_count" string="Auto-Generated SKUs to Clear"/>
+                    <field name="manual_sku_count" string="Manually Assigned SKUs (Preserved by Default)" invisible="manual_sku_count == 0"/>
+                </group>
+
+                <group invisible="manual_sku_count == 0">
+                    <field name="clear_manual_skus" widget="boolean_toggle"/>
+                </group>
+
+                <p class="text-muted small">
+                    After clearing, you can change the SKU Infix Template if needed and click <strong>Generate SKU</strong> to create new values.
+                </p>
+
+                <footer>
+                    <button name="action_confirm_clear"
+                            string="Confirm Clear SKUs"
+                            type="object"
+                            class="btn-danger"
+                            icon="fa-trash-o"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for the clear wizard -->
+    <record id="action_sku_clear_wizard" model="ir.actions.act_window">
+        <field name="name">Clear Generated SKUs</field>
+        <field name="res_model">sku.clear.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

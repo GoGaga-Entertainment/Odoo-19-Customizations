@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Display SKU on Product Page below Title -->
+    <template id="product_title_sku" inherit_id="website_sale.product_title" name="Product SKU Title">
+        <xpath expr="//h1" position="after">
+            <div id="product_sku" class="text-muted small mb-2" t-if="combination_info.get('default_code') or product.default_code">
+                SKU : <span class="js_sku" t-out="combination_info.get('default_code') or product.default_code"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Display SKU on Cart Lines -->
+    <template id="cart_lines_sku" inherit_id="website_sale.cart_lines" name="Product SKU Cart Lines">
+        <xpath expr="//div[hasclass('flex-grow-1') and hasclass('text-wrap')]" position="inside">
+            <div t-if="line.product_id and line.product_id.default_code" class="text-muted small mt-1">
+                SKU : <span t-out="line.product_id.default_code"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>

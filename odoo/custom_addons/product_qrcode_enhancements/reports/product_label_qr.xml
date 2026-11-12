@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- QWeb PDF Label 2x7 Extension: Render QR Code on right side of label -->
+    <template id="report_simple_label2x7_qr" inherit_id="product.report_simple_label2x7">
+        <xpath expr="//div[hasclass('o_label_data')]" position="inside">
+            <div class="float-end text-center ms-1 me-1" style="max-width: 25mm;" t-if="product.qr_code_image or product.qr_code_value">
+                <img t-if="product.qr_code_image" t-att-src="image_data_uri(product.qr_code_image)" style="width:20mm; height:20mm; object-fit:contain;"/>
+                <div t-else="" t-out="product.qr_code_value" t-options="{'widget': 'barcode', 'symbology': 'QR', 'img_style': 'width:20mm;height:20mm;'}"/>
+                <div style="font-size: 7pt; line-height: 1.1;" class="text-muted text-truncate" t-out="product.qr_code_value"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- QWeb PDF Label 4x7 Extension: Render QR Code on barcode container -->
+    <template id="report_simple_label4x7_qr" inherit_id="product.report_simple_label4x7">
+        <xpath expr="//div[hasclass('o_label_small_barcode')]" position="inside">
+            <div class="text-center mt-1" t-if="product.qr_code_image or product.qr_code_value">
+                <img t-if="product.qr_code_image" t-att-src="image_data_uri(product.qr_code_image)" style="width:13mm; height:13mm; object-fit:contain;"/>
+                <div t-else="" t-out="product.qr_code_value" t-options="{'widget': 'barcode', 'symbology': 'QR', 'img_style': 'width:13mm;height:13mm;'}"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- QWeb PDF Dymo Label Extension: Render QR Code alongside barcode -->
+    <template id="report_simple_label_dymo_qr" inherit_id="product.report_simple_label_dymo">
+        <xpath expr="//div[hasclass('o_label_full')]" position="inside">
+            <div class="float-end text-center me-1" style="max-width: 22mm;" t-if="product.qr_code_image or product.qr_code_value">
+                <img t-if="product.qr_code_image" t-att-src="image_data_uri(product.qr_code_image)" style="width:16mm; height:16mm; object-fit:contain;"/>
+                <div t-else="" t-out="product.qr_code_value" t-options="{'widget': 'barcode', 'symbology': 'QR', 'img_style': 'width:16mm;height:16mm;'}"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Inherit Normal ZPL Label to print actual product name and variant details, and append QR Code element in empty space right of barcode -->
+    <template id="normal_zpl_label_qr" inherit_id="stock.normal_zpl_label">
+        <xpath expr="//t[@t-if=&quot;product._name == 'product.product'&quot;]" position="replace">
+            <t t-if="product._name == 'product.product'">
+                <t t-set="variant_str" t-value="product._get_variant_attribute_values_str()"/>
+                <t t-if="variant_str">
+^FT35,35^A0N,22^FD<t t-out="(product.name[:32] + '...') if len(product.name or '') &gt; 35 else product.name"/>^FS
+^FT35,60^A0N,18^FD<t t-out="(variant_str[:35] + '...') if len(variant_str) &gt; 38 else variant_str"/>^FS
+                </t>
+                <t t-else="">
+^FT35,45^A0N,25^FD<t t-out="(product.name[:32] + '...') if len(product.name or '') &gt; 35 else product.name"/>^FS
+                </t>
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-if='barcode']" position="after">
+            <t t-if="product.qr_code_value">
+^FO310,77^BQN,2,3^FDMA,<t t-out="product.qr_code_value"/>^FS
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Inherit Alternative ZPL Label to print actual product name and variant details, and append QR Code element in empty space right of barcode -->
+    <template id="alternative_zpl_label_qr" inherit_id="stock.alternative_zpl_label">
+        <xpath expr="//t[@t-if=&quot;product._name == 'product.product'&quot;]" position="replace">
+            <t t-if="product._name == 'product.product'">
+                <t t-set="variant_str" t-value="product._get_variant_attribute_values_str()"/>
+                <t t-if="variant_str">
+^FT35,28^A0N,18^FD<t t-out="(product.name[:32] + '...') if len(product.name or '') &gt; 35 else product.name"/>^FS
+^FT35,46^A0N,14^FD<t t-out="(variant_str[:35] + '...') if len(variant_str) &gt; 38 else variant_str"/>^FS
+                </t>
+                <t t-else="">
+^FT35,35^A0N,20^FD<t t-out="(product.name[:32] + '...') if len(product.name or '') &gt; 35 else product.name"/>^FS
+                </t>
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-if='barcode']" position="after">
+            <t t-if="product.qr_code_value">
+^FO300,55^BQN,2,2^FDMA,<t t-out="product.qr_code_value"/>^FS
+            </t>
+        </xpath>
+    </template>
+</odoo>

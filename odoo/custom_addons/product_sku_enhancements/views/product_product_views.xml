@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Generate SKU button on Product Variant Easy Edit form -->
+    <record id="product_variant_easy_edit_view_sku" model="ir.ui.view">
+        <field name="name">product.product.easy.edit.sku</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="after">
+                <button name="action_generate_sku"
+                        string="Generate SKU"
+                        type="object"
+                        class="btn-sm btn-secondary ms-1"
+                        invisible="default_code != False"
+                        help="Generate Internal Reference (SKU) for this variant based on configured template and variant attributes."/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Generate SKU button on Product Variant full form view -->
+    <record id="product_normal_form_view_sku" model="ir.ui.view">
+        <field name="name">product.product.form.sku</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_generate_sku"
+                            string="Generate SKU"
+                            type="object"
+                            class="btn-primary"
+                            invisible="default_code != False"
+                            help="Generate SKU for this product variant."/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ensure default_code is displayed as the LAST column on Product Variant List view -->
+    <record id="product_product_tree_view_sku" model="ir.ui.view">
+        <field name="name">product.product.tree.sku</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="attributes">
+                <attribute name="column_invisible">True</attribute>
+            </xpath>
+            <xpath expr="//list" position="inside">
+                <field name="default_code" string="SKU / Internal Ref" optional="show"/>
+                <field name="is_sku_generated" string="Auto-Generated" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ensure default_code is formatted below Product Name in Product Variant Kanban view -->
+    <record id="product_kanban_view_sku" model="ir.ui.view">
+        <field name="name">product.product.kanban.sku</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//span[field[@name='default_code']]" position="replace">
+                <div t-if="record.default_code.value" class="text-muted small mb-1">
+                    <strong>SKU:</strong> <field name="default_code"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

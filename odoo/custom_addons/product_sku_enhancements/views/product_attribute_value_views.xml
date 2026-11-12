@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add sku_short_code to product.attribute.value list view -->
+    <record id="product_attribute_value_list_sku" model="ir.ui.view">
+        <field name="name">product.attribute.value.list.sku</field>
+        <field name="model">product.attribute.value</field>
+        <field name="inherit_id" ref="product.product_attribute_value_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="sku_short_code" placeholder="e.g. NVY"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add sku_short_code to value_ids inside product.attribute form view -->
+    <record id="product_attribute_view_form_sku" model="ir.ui.view">
+        <field name="name">product.attribute.form.sku</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='value_ids']/list/field[@name='name']" position="after">
+                <field name="sku_short_code" placeholder="Short Code (e.g. XL)"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

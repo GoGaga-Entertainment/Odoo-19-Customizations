@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Centralized Global ir.sequence for Product SKU generation -->
+        <record id="seq_product_sku_global" model="ir.sequence">
+            <field name="name">Product SKU Global Values</field>
+            <field name="code">product.sku.global</field>
+            <field name="implementation">standard</field>
+            <field name="prefix">GOGAGA-IN-</field>
+            <field name="suffix">-%(year)s</field>
+            <field name="padding">0</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Fallback ir.sequence for Product SKU generation -->
+        <record id="seq_product_sku_fallback" model="ir.sequence">
+            <field name="name">Product SKU Fallback Sequence</field>
+            <field name="code">product.sku.fallback</field>
+            <field name="prefix">SKU-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>
